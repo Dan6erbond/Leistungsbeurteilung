@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/loginFragment"
+        android:icon="@drawable/ic_person"
+        android:title="@string/login" />
+    <item
+        android:id="@+id/QRFragment"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="@string/qr_code" />
+    <item
+        android:id="@+id/signUpFragment"
+        android:icon="@drawable/ic_person_add"
+        android:title="@string/sign_up" />
+</menu>

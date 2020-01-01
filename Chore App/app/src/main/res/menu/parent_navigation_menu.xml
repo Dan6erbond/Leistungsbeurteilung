@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/parentProfileFragment"
+        android:icon="@drawable/ic_person"
+        android:title="@string/profile" />
+    <item
+        android:id="@+id/parentChoresFragment"
+        android:icon="@drawable/ic_menu_manage"
+        android:title="@string/chores" />
+    <item
+        android:id="@+id/parentStoreFragment"
+        android:enabled="false"
+        android:icon="@drawable/ic_store"
+        android:title="@string/store" />
+</menu>
