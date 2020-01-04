@@ -8,7 +8,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".parent.ChoreDetailActivity">
+        tools:context=".parent.chore.ChoreDetailActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -106,7 +106,7 @@
             android:layout_marginBottom="4dp"
             android:layout_marginStart="16dp"
             android:gravity="center_vertical"
-            android:text="Saving changes..." />
+            android:text="@string/saving_changes" />
 
     </androidx.cardview.widget.CardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

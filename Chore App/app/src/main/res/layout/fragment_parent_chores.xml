@@ -11,7 +11,7 @@
         android:paddingBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".parent.ParentChoresFragment" />
+        tools:context=".parent.chore.ParentChoresFragment" />
 
     <!--FAB does not render correctly in Android Studio preview-->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -28,4 +28,25 @@
         app:fabSize="normal"
         android:clickable="true"
         android:focusable="true" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/savingCardView"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="2dp"
+        android:translationZ="4dp"
+        app:cardElevation="2dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
+            android:text="@string/saving_changes" />
+
+    </androidx.cardview.widget.CardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

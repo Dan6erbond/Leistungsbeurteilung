@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.models.ParentDAO
+import ch.bbbaden.choreapp.parent.child.ChildRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_parent_profile.*
 
@@ -73,7 +74,8 @@ class ParentProfileFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
-        adapter = ChildRecyclerAdapter(parent!!.childrenL)
+        adapter =
+            ChildRecyclerAdapter(parent!!.childrenL)
         parentImg.setImageBitmap(parent?.getQRCode(smallerDimension))
         nameTxt.text = "${parent?.first} ${parent?.last ?: ""}"
         emailTxt.text = parent?.email

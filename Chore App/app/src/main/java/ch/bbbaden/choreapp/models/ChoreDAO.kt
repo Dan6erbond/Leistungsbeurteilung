@@ -46,22 +46,34 @@ class ChoreDAO {
             }
     }
 
-    fun getChores(parent: Parent, callback: ((ArrayList<Chore>?) -> Unit)? = null) {
-        getChores(parent.userId!!) {
-            if (it != null) {
-                for (i in it.indices) {
-                    it[i].parent = parent
-                }
-                callback?.invoke(it)
-            } else {
-                callback?.invoke(null)
-            }
-        }
-    }
-
     fun saveChore(parent: Parent, chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
         db.collection("users").document(parent.userId!!).collection("chores").document(chore.id!!)
             .set(chore.getData())
+            .addOnSuccessListener {
+                callback?.invoke(true)
+            }
+            .addOnFailureListener {
+                callback?.invoke(false)
+                Log.e(this::class.simpleName, it.message ?: it.toString())
+            }
+    }
+
+    fun addChore(parent: Parent, chore: Chore, callback: ((chore: Chore?) -> Unit)? = null) {
+        db.collection("users").document(parent.userId!!).collection("chores")
+            .add(chore.getData())
+            .addOnSuccessListener {
+                chore.id = it.id
+                callback?.invoke(chore)
+            }
+            .addOnFailureListener {
+                callback?.invoke(null)
+                Log.e(this::class.simpleName, it.message ?: it.toString())
+            }
+    }
+
+    fun deleteChore(parent: Parent, chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
+        db.collection("users").document(parent.userId!!).collection("chores").document(chore.id!!)
+            .delete()
             .addOnSuccessListener {
                 callback?.invoke(true)
             }

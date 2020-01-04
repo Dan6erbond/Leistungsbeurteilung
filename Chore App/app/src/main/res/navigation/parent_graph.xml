@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/parentChoresFragment"
-        android:name="ch.bbbaden.choreapp.parent.ParentChoresFragment"
+        android:name="ch.bbbaden.choreapp.parent.chore.ParentChoresFragment"
         android:label="fragment_parent_chores"
         tools:layout="@layout/fragment_parent_chores">
         <argument

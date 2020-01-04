@@ -9,14 +9,13 @@ import java.io.Serializable
 import java.util.*
 
 class Chore(
-    @DocumentId val id: String? = null,
+    @DocumentId var id: String? = null,
     val name: String? = null,
     val description: String? = null,
     val assignments: ArrayList<Assignment> = arrayListOf()
 ) : Serializable {
 
     var child: Child? = null
-    var parent: Parent? = null
 
     fun getQRCode(smallerDimension: Int): Bitmap {
         val content = "choreid:$id"
@@ -61,9 +60,9 @@ class Chore(
         )
     }
 
-    fun addAssignment(assignment: Assignment, callback: ((success: Boolean) -> Unit)? = null) {
+    fun addAssignment(assignment: Assignment, parent: Parent, callback: ((success: Boolean) -> Unit)? = null) {
         assignments.add(assignment)
-        ChoreDAO().saveChore(parent!!, this) {
+        ChoreDAO().saveChore(parent, this) {
             callback?.invoke(it)
         }
     }

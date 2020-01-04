@@ -14,6 +14,7 @@ import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.models.Chore
+import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.parent.child.ChildArrayAdapter
 import kotlinx.android.synthetic.main.card_chore_assignment.view.*
 
@@ -74,23 +75,25 @@ class ChoreAssignmentRecyclerAdapter(private val assignments: List<Assignment>) 
             }
 
             val chore = (view.context as Activity).intent.extras?.get("chore") as Chore?
+            val parent = (view.context as Activity).intent.extras?.get("parent") as Parent?
+
             val childArrayAdapter =
                 ChildArrayAdapter(
                     view.context,
-                    chore!!.parent!!.childrenL
+                    parent!!.childrenL
                 )
             view.childSpinner.adapter = childArrayAdapter
 
 
             var childIndex = 0
-            for (i in chore!!.parent!!.childrenL.indices) {
-                if (chore!!.parent!!.childrenL[i].userId == assignment.assignedTo) {
+            for (i in parent!!.childrenL.indices) {
+                if (parent!!.childrenL[i].userId == assignment.assignedTo) {
                     childIndex = i
                     break
                 }
             }
 
-            view.childName.text = chore!!.parent!!.childrenL[childIndex].first
+            view.childName.text = parent!!.childrenL[childIndex].first
             view.childSpinner.setSelection(childIndex)
 
             view.childSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

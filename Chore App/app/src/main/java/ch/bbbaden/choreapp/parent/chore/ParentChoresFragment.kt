@@ -3,12 +3,16 @@ package ch.bbbaden.choreapp.parent.chore
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.Slide
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.models.Chore
 import ch.bbbaden.choreapp.models.Parent
@@ -19,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_parent_chores.*
 class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogListener {
 
     companion object {
-        val RC_CHORE_DETAILS = 0
+        const val RC_CHORE_DETAILS = 0
     }
 
     private var parent: Parent? = null
@@ -60,6 +64,13 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
                 }
             }
         }
+
+        val transition: Transition = Slide(Gravity.BOTTOM)
+        transition.duration = 600
+        transition.addTarget(R.id.savingCardView)
+
+        TransitionManager.beginDelayedTransition(savingCardView.parent as ViewGroup, transition)
+        savingCardView.visibility = View.GONE
     }
 
     private fun setupUI() {
@@ -73,8 +84,7 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
         recyclerViewChores.adapter = adapter
 
         fabAddChore.setOnClickListener {
-            val dialog =
-                AddChoreDialogFragment()
+            val dialog = AddChoreDialogFragment(this)
             dialog.show(fragmentManager!!, "AddChoreDialogFragment")
         }
     }
@@ -82,7 +92,9 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     fun openDetails(chore: Chore) {
         val intent = Intent(context, ChoreDetailActivity::class.java)
         intent.putExtra("chore", chore)
-        startActivityForResult(intent,
+        intent.putExtra("parent", parent)
+        startActivityForResult(
+            intent,
             RC_CHORE_DETAILS
         )
     }
@@ -91,12 +103,34 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_CHORE_DETAILS) {
             if (resultCode == Activity.RESULT_OK) {
+                parent = data?.extras?.get("parent") as Parent?
                 setupUI()
             }
         }
     }
 
     override fun addChore(dialog: DialogFragment, chore: Chore) {
-        println(chore)
+        // slideSaving(View.VISIBLE)
+
+        parent?.addChore(chore) {
+            if (it != null) {
+                adapter.notifyDataSetChanged()
+            }
+
+            // TODO: Show error if operation failed
+            // slideSaving(View.GONE)
+        }
+    }
+
+    private fun slideSaving(visibility: Int) {
+        val transition: Transition = Slide(Gravity.BOTTOM)
+        transition.duration = 600
+        transition.addTarget(R.id.savingCardView)
+
+        TransitionManager.beginDelayedTransition(
+            savingCardView.parent as ViewGroup,
+            transition
+        )
+        savingCardView.visibility = visibility
     }
 }

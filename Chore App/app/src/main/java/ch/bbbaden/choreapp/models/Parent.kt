@@ -39,9 +39,10 @@ data class Parent (
         }
     }
 
-    fun fetchChores(callback: ((ArrayList<Chore>) -> Unit)? = null) {
-        if (chores.isEmpty()) {
-            ChoreDAO().getChores(this) {
+    fun fetchChores(force: Boolean = false, callback: ((ArrayList<Chore>) -> Unit)? = null) {
+        if (chores.isEmpty() || force) {
+            ChoreDAO().getChores(this.userId!!) {
+                chores.clear()
                 chores.addAll(it!!)
                 callback?.invoke(chores)
             }
@@ -56,6 +57,20 @@ data class Parent (
                 chores.remove(chore)
                 chores.add(chore)
             }
+            callback?.invoke(it)
+        }
+    }
+
+    fun addChore(chore: Chore, callback: ((chore: Chore?) -> Unit)? = null) {
+        ChoreDAO().addChore(this, chore) {
+            if (it != null) chores.add(it)
+            callback?.invoke(it)
+        }
+    }
+
+    fun deleteChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
+        ChoreDAO().deleteChore(this, chore) {
+            if (it) chores.remove(chore)
             callback?.invoke(it)
         }
     }
