@@ -1,4 +1,4 @@
-package ch.bbbaden.choreapp.parent
+package ch.bbbaden.choreapp.parent.child
 
 import android.annotation.SuppressLint
 import android.view.View

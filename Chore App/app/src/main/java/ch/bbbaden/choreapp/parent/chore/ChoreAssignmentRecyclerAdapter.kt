@@ -1,4 +1,4 @@
-package ch.bbbaden.choreapp.parent
+package ch.bbbaden.choreapp.parent.chore
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -14,6 +14,7 @@ import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.models.Chore
+import ch.bbbaden.choreapp.parent.child.ChildArrayAdapter
 import kotlinx.android.synthetic.main.card_chore_assignment.view.*
 
 class ChoreAssignmentRecyclerAdapter(private val assignments: List<Assignment>) :
@@ -73,7 +74,11 @@ class ChoreAssignmentRecyclerAdapter(private val assignments: List<Assignment>) 
             }
 
             val chore = (view.context as Activity).intent.extras?.get("chore") as Chore?
-            val childArrayAdapter = ChildArrayAdapter(view.context, chore!!.parent!!.childrenL)
+            val childArrayAdapter =
+                ChildArrayAdapter(
+                    view.context,
+                    chore!!.parent!!.childrenL
+                )
             view.childSpinner.adapter = childArrayAdapter
 
 

@@ -1,4 +1,4 @@
-package ch.bbbaden.choreapp.parent
+package ch.bbbaden.choreapp.parent.chore
 
 import android.app.Activity
 import android.content.Intent
@@ -63,14 +63,18 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     }
 
     private fun setupUI() {
-        adapter = ChoreRecyclerAdapter(parent!!.chores, this)
+        adapter = ChoreRecyclerAdapter(
+            parent!!.chores,
+            this
+        )
         parent?.fetchChores {
             adapter.notifyDataSetChanged()
         }
         recyclerViewChores.adapter = adapter
 
         fabAddChore.setOnClickListener {
-            val dialog = AddChoreDialogFragment()
+            val dialog =
+                AddChoreDialogFragment()
             dialog.show(fragmentManager!!, "AddChoreDialogFragment")
         }
     }
@@ -78,7 +82,9 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     fun openDetails(chore: Chore) {
         val intent = Intent(context, ChoreDetailActivity::class.java)
         intent.putExtra("chore", chore)
-        startActivityForResult(intent, RC_CHORE_DETAILS)
+        startActivityForResult(intent,
+            RC_CHORE_DETAILS
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -1,4 +1,4 @@
-package ch.bbbaden.choreapp.parent
+package ch.bbbaden.choreapp.parent.child
 
 import android.content.Context
 import android.view.LayoutInflater

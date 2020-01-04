@@ -1,4 +1,4 @@
-package ch.bbbaden.choreapp.parent
+package ch.bbbaden.choreapp.parent.chore
 
 import android.app.Activity
 import android.os.Bundle
@@ -32,7 +32,10 @@ class ChoreDetailActivity : AppCompatActivity() {
             choreName.text = it.name
             choreDescription.text = it.description
 
-            adapter = ChoreAssignmentRecyclerAdapter(it.assignments)
+            adapter =
+                ChoreAssignmentRecyclerAdapter(
+                    it.assignments
+                )
             adapter.notifyDataSetChanged()
 
             choreAssignments.adapter = adapter
