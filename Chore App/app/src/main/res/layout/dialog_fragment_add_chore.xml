@@ -8,7 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:background="@color/colorPrimary"
-        android:contentDescription="@string/app_name"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:scaleType="center"

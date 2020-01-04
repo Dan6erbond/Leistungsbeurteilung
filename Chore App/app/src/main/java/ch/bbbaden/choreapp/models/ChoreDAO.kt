@@ -16,7 +16,7 @@ class ChoreDAO {
                         val assignedTo = assignment.assignedTo == child.userId
                         val nextAssignmentExists = assignment.getNextDate() != null
                         if (assignedTo && nextAssignmentExists) {
-                            chore.childId = child.userId
+                            chore.child = child
                             chores.add(chore)
                             break
                         }
@@ -46,8 +46,29 @@ class ChoreDAO {
             }
     }
 
-    fun addChore(userId: String, callback: ((Chore) -> Unit)? = null) {
+    fun getChores(parent: Parent, callback: ((ArrayList<Chore>?) -> Unit)? = null) {
+        getChores(parent.userId!!) {
+            if (it != null) {
+                for (i in it.indices) {
+                    it[i].parent = parent
+                }
+                callback?.invoke(it)
+            } else {
+                callback?.invoke(null)
+            }
+        }
+    }
 
+    fun saveChore(parent: Parent, chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
+        db.collection("users").document(parent.userId!!).collection("chores").document(chore.id!!)
+            .set(chore.getData())
+            .addOnSuccessListener {
+                callback?.invoke(true)
+            }
+            .addOnFailureListener {
+                callback?.invoke(false)
+                Log.e(this::class.simpleName, it.message ?: it.toString())
+            }
     }
 
 }

@@ -1,12 +1,11 @@
 package ch.bbbaden.choreapp.models
 
 import android.graphics.Bitmap
-import android.text.format.DateUtils
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import com.google.firebase.firestore.DocumentId
 import com.google.zxing.WriterException
-import java.text.SimpleDateFormat
+import java.io.Serializable
 import java.util.*
 
 class Chore(
@@ -14,9 +13,10 @@ class Chore(
     val name: String? = null,
     val description: String? = null,
     val assignments: ArrayList<Assignment> = arrayListOf()
-) {
+) : Serializable {
 
-    var childId: String? = null
+    var child: Child? = null
+    var parent: Parent? = null
 
     fun getQRCode(smallerDimension: Int): Bitmap {
         val content = "choreid:$id"
@@ -29,25 +29,22 @@ class Chore(
         }
     }
 
-    fun getNextDate(): Date? {
+    private fun getAssignment(): Assignment? {
         for (assignment in assignments) {
-            if (assignment.assignedTo == childId) {
-                return assignment.getNextDate()
+            if (assignment.assignedTo == child?.userId) {
+                return assignment
             }
         }
         return null
     }
 
     fun getDisplayTime(): String? {
-        val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
-        val timeFormat = SimpleDateFormat.getTimeInstance()
-        val nextDate = getNextDate()
-        return if (nextDate != null) {
-            if (DateUtils.isToday(nextDate.time))
-                timeFormat.format(nextDate) else dateTimeFormat.format(nextDate)
-        } else {
-            null
+        getAssignment()?.let { assignment ->
+            assignment.getNextDate()?.let {
+                return assignment.getDisplayTime(it)
+            }
         }
+        return null
     }
 
     override fun equals(other: Any?): Boolean =
@@ -55,5 +52,20 @@ class Chore(
         else false
 
     override fun hashCode(): Int = Objects.hash(id, name, description)
+
+    fun getData(): HashMap<String, *> {
+        return hashMapOf(
+            "name" to name,
+            "description" to description,
+            "assignments" to assignments.map { it.getData() }
+        )
+    }
+
+    fun addAssignment(assignment: Assignment, callback: ((success: Boolean) -> Unit)? = null) {
+        assignments.add(assignment)
+        ChoreDAO().saveChore(parent!!, this) {
+            callback?.invoke(it)
+        }
+    }
 
 }

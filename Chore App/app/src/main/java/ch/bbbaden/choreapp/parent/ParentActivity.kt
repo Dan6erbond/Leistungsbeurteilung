@@ -10,7 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.bbbaden.choreapp.R
-import ch.bbbaden.choreapp.models.ParentDAO
+import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.signin.SignInActivity
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_parent.*
@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_parent.*
 class ParentActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var user: Parent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,16 +31,19 @@ class ParentActivity : AppCompatActivity() {
         val host: NavHostFragment = parentFragment as NavHostFragment? ?: return
         val navController = host.navController
 
-        ParentDAO().getParent(auth.currentUser!!.uid) {
-            it?.let {
-                val bundle = bundleOf("user" to it)
-                navController.setGraph(R.navigation.parent_graph, bundle) // setting the graph programmatically to pass args
-                parentNavigation.setupWithNavController(navController)
+        val user = intent.extras?.get("user") as Parent?
 
-                parentNavigation.setOnNavigationItemSelectedListener { menuItem ->
-                    parentFragment.findNavController().navigate(menuItem.itemId, bundle)
-                    true
-                }
+        user?.let {
+            val bundle = bundleOf("user" to it)
+            navController.setGraph(
+                R.navigation.parent_graph,
+                bundle
+            ) // setting the graph programmatically to pass args
+            parentNavigation.setupWithNavController(navController)
+
+            parentNavigation.setOnNavigationItemSelectedListener { menuItem ->
+                parentFragment.findNavController().navigate(menuItem.itemId, bundle)
+                true
             }
         }
     }

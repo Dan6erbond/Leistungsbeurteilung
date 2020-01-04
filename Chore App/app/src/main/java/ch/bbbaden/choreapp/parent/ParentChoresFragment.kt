@@ -1,5 +1,7 @@
 package ch.bbbaden.choreapp.parent
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,10 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_parent_chores.*
 
 class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogListener {
+
+    companion object {
+        val RC_CHORE_DETAILS = 0
+    }
 
     private var parent: Parent? = null
 
@@ -57,7 +63,7 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     }
 
     private fun setupUI() {
-        adapter = ChoreRecyclerAdapter(parent!!.chores)
+        adapter = ChoreRecyclerAdapter(parent!!.chores, this)
         parent?.fetchChores {
             adapter.notifyDataSetChanged()
         }
@@ -66,6 +72,21 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
         fabAddChore.setOnClickListener {
             val dialog = AddChoreDialogFragment()
             dialog.show(fragmentManager!!, "AddChoreDialogFragment")
+        }
+    }
+
+    fun openDetails(chore: Chore) {
+        val intent = Intent(context, ChoreDetailActivity::class.java)
+        intent.putExtra("chore", chore)
+        startActivityForResult(intent, RC_CHORE_DETAILS)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_CHORE_DETAILS) {
+            if (resultCode == Activity.RESULT_OK) {
+                setupUI()
+            }
         }
     }
 

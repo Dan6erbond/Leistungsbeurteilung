@@ -37,14 +37,14 @@ class ChildDAO {
             }
     }
 
-    fun getChildren(parentId: String, callback: ((ArrayList<Child>?) -> Unit)? = null) {
-        db.collection("users").document(parentId).collection("children")
+    fun getChildren(parent: Parent, callback: ((ArrayList<Child>?) -> Unit)? = null) {
+        db.collection("users").document(parent.userId!!).collection("children")
             .get()
             .addOnSuccessListener {
                 val children = ArrayList<Child>()
                 for (document in it.documents) {
                     val child = document.toObject(Child::class.java)
-                    child!!.parentId = parentId
+                    child!!.parent = parent
                     children.add(child)
                 }
                 callback?.invoke(children)
@@ -54,5 +54,4 @@ class ChildDAO {
                 Log.e(this::class.simpleName, it.message ?: it.toString())
             }
     }
-
 }

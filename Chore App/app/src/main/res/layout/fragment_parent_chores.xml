@@ -7,11 +7,13 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewChores"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".parent.ParentChoresFragment" />
 
-    <!--FAB does not seem to render correctly in Android Studio preview-->
+    <!--FAB does not render correctly in Android Studio preview-->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddChore"
         android:layout_width="wrap_content"

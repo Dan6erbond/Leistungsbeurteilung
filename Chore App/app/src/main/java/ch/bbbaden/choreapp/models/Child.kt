@@ -15,6 +15,13 @@ data class Child(
     val chores: ArrayList<Chore> = arrayListOf()
 ) : Serializable {
 
+    var parent: Parent? = null
+        set(value) {
+            field = value
+            parentId = value?.userId
+        }
+
+
     fun getQRCode(smallerDimension: Int): Bitmap {
         val content = "childuid:$userId"
         val qrgEncoder = QRGEncoder(content, null, QRGContents.Type.TEXT, smallerDimension)

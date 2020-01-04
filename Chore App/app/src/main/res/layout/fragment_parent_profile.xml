@@ -51,8 +51,10 @@
         android:id="@+id/recyclerViewChildren"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/parentProfileView"
-        android:scrollbars="vertical" />
+        app:layout_constraintTop_toBottomOf="@+id/parentProfileView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
