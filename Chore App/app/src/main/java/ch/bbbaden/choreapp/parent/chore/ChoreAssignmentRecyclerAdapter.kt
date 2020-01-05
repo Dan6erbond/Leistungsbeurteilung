@@ -8,38 +8,43 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
-import ch.bbbaden.choreapp.models.Chore
 import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.parent.child.ChildArrayAdapter
 import kotlinx.android.synthetic.main.card_chore_assignment.view.*
 
-class ChoreAssignmentRecyclerAdapter(private val assignments: List<Assignment>) :
-    RecyclerView.Adapter<ChoreAssignmentRecyclerAdapter.ChoreHolder>() {
+class ChoreAssignmentRecyclerAdapter(
+    private val assignments: List<Assignment>,
+    private val deleteAssignmentDialogListener: DeleteAssignmentDialogFragment.DeleteAssignmentDialogListener
+) :
+    RecyclerView.Adapter<ChoreAssignmentRecyclerAdapter.AssignmentHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ChoreHolder {
+    ): AssignmentHolder {
         val inflatedView = parent.inflate(R.layout.card_chore_assignment, false)
-        return ChoreHolder(
+        return AssignmentHolder(
             inflatedView
         )
     }
 
     override fun getItemCount() = assignments.size
 
-    override fun onBindViewHolder(holder: ChoreHolder, position: Int) {
+    override fun onBindViewHolder(holder: AssignmentHolder, position: Int) {
         val assignment = assignments[position]
+        holder.deleteAssignmentDialogListener = deleteAssignmentDialogListener
         holder.bindItem(assignment)
     }
 
-    class ChoreHolder(v: View) : RecyclerView.ViewHolder(v) {
+    class AssignmentHolder(v: View) : RecyclerView.ViewHolder(v) {
 
+        lateinit var deleteAssignmentDialogListener: DeleteAssignmentDialogFragment.DeleteAssignmentDialogListener
         private var view: View = v
         private var assignment: Assignment? = null
         private var detailsOpen = false
@@ -70,12 +75,24 @@ class ChoreAssignmentRecyclerAdapter(private val assignments: List<Assignment>) 
             this.assignment = assignment
             view.startDate.setText(assignment.getDisplayTime(assignment.startDate))
 
-            view.choreAssignmentCollapseButton.setOnClickListener {
+            // val chore = (view.context as Activity).intent.extras?.get("chore") as Chore?
+            val parent = (view.context as Activity).intent.extras?.get("parent") as Parent?
+
+            view.choreAssignmentTitleButton.setOnClickListener {
                 toggleDetails()
             }
 
-            val chore = (view.context as Activity).intent.extras?.get("chore") as Chore?
-            val parent = (view.context as Activity).intent.extras?.get("parent") as Parent?
+            view.choreAssignmentTitleButton.setOnLongClickListener {
+                val dialog = DeleteAssignmentDialogFragment(
+                    deleteAssignmentDialogListener,
+                    assignment
+                )
+                dialog.show(
+                    (view.context as AppCompatActivity).supportFragmentManager,
+                    "DeleteAssignmentDialogFragment"
+                )
+                true
+            }
 
             val childArrayAdapter =
                 ChildArrayAdapter(
@@ -103,12 +120,13 @@ class ChoreAssignmentRecyclerAdapter(private val assignments: List<Assignment>) 
 
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
-                    view: View?,
+                    v: View?,
                     position: Int,
                     id: Long
                 ) {
                     val child = parent!!.getItemAtPosition(position) as Child
                     assignment.assignedTo = child.userId
+                    view.childName.text = child.first
                 }
 
             }
@@ -122,6 +140,17 @@ class ChoreAssignmentRecyclerAdapter(private val assignments: List<Assignment>) 
             )
             unitAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
             view.repeatUnit.adapter = unitAdapter
+
+            var unitIndex = 0
+            for (i in Assignment.repeatValues.indices) {
+                if (Assignment.repeatValues[i] == assignment.repeat["unit"]!!.toString()) {
+                    unitIndex = i
+                    break
+                }
+            }
+
+            view.repeatUnit.setSelection(unitIndex)
+
             view.repeatUnit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
 

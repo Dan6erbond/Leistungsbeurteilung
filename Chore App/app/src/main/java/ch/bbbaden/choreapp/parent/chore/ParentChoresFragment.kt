@@ -3,6 +3,7 @@ package ch.bbbaden.choreapp.parent.chore
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -46,6 +47,8 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: ChoreRecyclerAdapter
 
+    var errorCardViewOpen = true
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -65,12 +68,10 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
             }
         }
 
-        val transition: Transition = Slide(Gravity.BOTTOM)
-        transition.duration = 600
-        transition.addTarget(R.id.savingCardView)
-
-        TransitionManager.beginDelayedTransition(savingCardView.parent as ViewGroup, transition)
-        savingCardView.visibility = View.GONE
+        closeErrorCardView()
+        closeErrorCardViewBtn.setOnClickListener {
+            closeErrorCardView()
+        }
     }
 
     private fun setupUI() {
@@ -110,27 +111,41 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     }
 
     override fun addChore(dialog: DialogFragment, chore: Chore) {
-        // slideSaving(View.VISIBLE)
-
         parent?.addChore(chore) {
             if (it != null) {
                 adapter.notifyDataSetChanged()
+            } else {
+                openErrorCardView()
+                Handler().postDelayed({
+                    closeErrorCardView()
+                }, 1000)
             }
-
-            // TODO: Show error if operation failed
-            // slideSaving(View.GONE)
         }
     }
 
-    private fun slideSaving(visibility: Int) {
+    private fun closeErrorCardView() {
+        if (errorCardViewOpen) {
+            slideErrorCardView(View.GONE)
+            errorCardViewOpen = false
+        }
+    }
+
+    private fun openErrorCardView() {
+        if (!errorCardViewOpen) {
+            slideErrorCardView(View.VISIBLE)
+            errorCardViewOpen = true
+        }
+    }
+
+    private fun slideErrorCardView(visibility: Int) {
         val transition: Transition = Slide(Gravity.BOTTOM)
         transition.duration = 600
         transition.addTarget(R.id.savingCardView)
 
         TransitionManager.beginDelayedTransition(
-            savingCardView.parent as ViewGroup,
+            errorCardView.parent as ViewGroup,
             transition
         )
-        savingCardView.visibility = visibility
+        errorCardView.visibility = visibility
     }
 }

@@ -25,6 +25,14 @@ data class Assignment(
         this.startDate = startDate!!.toDate()
     }
 
+    constructor(
+        assignedTo: String? = null,
+        repeat: HashMap<String, Any>? = hashMapOf(),
+        startDate: Date? = null
+    ) : this(assignedTo, repeat) {
+        this.startDate = startDate!!
+    }
+
     fun getNextDate(): Date? {
         val currentDate = Calendar.getInstance().time
         val nextDate = startDate
@@ -75,6 +83,26 @@ data class Assignment(
             ),
             "startDate" to Timestamp(startDate)
         )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Assignment
+
+        if (assignedTo != other.assignedTo) return false
+        if (repeat != other.repeat) return false
+        if (startDate != other.startDate) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = assignedTo?.hashCode() ?: 0
+        result = 31 * result + (repeat?.hashCode() ?: 0)
+        result = 31 * result + startDate.hashCode()
+        return result
     }
 
 }

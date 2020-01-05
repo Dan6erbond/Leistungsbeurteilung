@@ -144,4 +144,6 @@
     <string name="delete">Delete</string>
     <string name="yes">Yes</string>
     <string name="remove_chore_confirmation">Are you sure you want to remove this chore?</string>
+    <string name="error_adding_chore">Error adding chore!</string>
+    <string name="remove_assignment_confirmation">Are you sure you want to remove this assignment?</string>
 </resources>
