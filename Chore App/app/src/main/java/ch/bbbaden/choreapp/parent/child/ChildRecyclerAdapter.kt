@@ -1,11 +1,16 @@
 package ch.bbbaden.choreapp.parent.child
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Point
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.dialogs.QRDialogFragment
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Child
 import kotlinx.android.synthetic.main.card_view_child.view.*
@@ -36,6 +41,19 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         private var view: View = v
         private var child: Child? = null
 
+        private val smallerDimension: Int
+            get() {
+                val manager = view.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                val display = manager.defaultDisplay
+                val point = Point()
+                display.getSize(point)
+                val width = point.x
+                val height = point.y
+                Pair(width, height)
+                val smallerDimension = if (width < height) width else height
+                return smallerDimension * 3 / 4
+            }
+
         init {
             v.setOnClickListener(this)
         }
@@ -45,6 +63,16 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
             this.child = child
             // view.childImage.setImageResource(R.drawable.ic_menu_camera)
             view.childName.text = child.first
+
+            view.childQR.setImageBitmap(child.getQRCode(smallerDimension))
+            view.childQR.setOnClickListener {
+                val dialog =
+                    QRDialogFragment(child)
+                dialog.show(
+                    (view.context as AppCompatActivity).supportFragmentManager,
+                    "ChildQRDialogFragment"
+                )
+            }
         }
 
         override fun onClick(v: View) {

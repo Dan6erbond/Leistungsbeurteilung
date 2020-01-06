@@ -7,9 +7,9 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.bbbaden.choreapp.R
-import ch.bbbaden.choreapp.models.ChildDAO
+import ch.bbbaden.choreapp.UserManager
+import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.signin.SignInActivity
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_child.*
 
 class ChildActivity : AppCompatActivity() {
@@ -17,31 +17,34 @@ class ChildActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: ChoreRecyclerAdapter
 
-    private lateinit var auth: FirebaseAuth
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_child)
         setSupportActionBar(childToolbar)
 
-        auth = FirebaseAuth.getInstance()
-
         linearLayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = linearLayoutManager
 
-        ChildDAO().getChild("EEhtqfYn0q2ERtKMCxr0") {
-            it?.let {
-                adapter = ChoreRecyclerAdapter(it.chores)
-                it.fetchChores {
-                    adapter.notifyDataSetChanged()
-                }
-                recyclerView.adapter = adapter
-                swipeRefreshLayout.setOnRefreshListener {
-                    it.fetchChores {
-                        adapter.notifyDataSetChanged()
-                        swipeRefreshLayout.isRefreshing = false
-                    }
-                }
+        UserManager.child?.let {
+            setupUI()
+        } ?: run {
+            UserManager.getUser {
+                if (it is Child) setupUI()
+                else TODO("Show error")
+            }
+        }
+    }
+
+    private fun setupUI() {
+        adapter = ChoreRecyclerAdapter(UserManager.child!!.chores)
+        UserManager.child!!.fetchChores {
+            adapter.notifyDataSetChanged()
+        }
+        recyclerView.adapter = adapter
+        swipeRefreshLayout.setOnRefreshListener {
+            UserManager.child!!.fetchChores {
+                adapter.notifyDataSetChanged()
+                swipeRefreshLayout.isRefreshing = false
             }
         }
     }
@@ -63,7 +66,7 @@ class ChildActivity : AppCompatActivity() {
     }
 
     private fun signOut() {
-        auth.signOut()
+        UserManager.signOut()
         val intent = Intent(this, SignInActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)

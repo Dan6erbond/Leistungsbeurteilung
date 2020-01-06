@@ -15,23 +15,17 @@ import androidx.transition.Slide
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.models.Chore
 import ch.bbbaden.choreapp.models.Parent
-import ch.bbbaden.choreapp.models.ParentDAO
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_parent_chores.*
 
-class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogListener {
+class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogListener,
+    ChoreRecyclerAdapter.ChoreHolder.ChoreHolderListener {
 
     companion object {
         const val RC_CHORE_DETAILS = 0
-    }
-
-    private var parent: Parent? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parent = arguments?.get("user") as Parent?
     }
 
     override fun onCreateView(
@@ -47,7 +41,7 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: ChoreRecyclerAdapter
 
-    var errorCardViewOpen = true
+    private var errorCardViewOpen = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,14 +51,12 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
         linearLayoutManager = LinearLayoutManager(context)
         recyclerViewChores.layoutManager = linearLayoutManager
 
-        if (parent != null) {
+        UserManager.parent?.let {
             setupUI()
-        } else {
-            ParentDAO().getParent(auth.currentUser!!.uid) {
-                it?.let {
-                    parent = it
-                    setupUI()
-                }
+        } ?: run {
+            UserManager.getUser {
+                if (it is Parent) setupUI()
+                else TODO("Show error")
             }
         }
 
@@ -76,10 +68,10 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
 
     private fun setupUI() {
         adapter = ChoreRecyclerAdapter(
-            parent!!.chores,
+            UserManager.parent!!.chores,
             this
         )
-        parent?.fetchChores {
+        UserManager.parent?.fetchChores {
             adapter.notifyDataSetChanged()
         }
         recyclerViewChores.adapter = adapter
@@ -90,10 +82,9 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
         }
     }
 
-    fun openDetails(chore: Chore) {
+    override fun openDetails(chore: Chore) {
         val intent = Intent(context, ChoreDetailActivity::class.java)
         intent.putExtra("chore", chore)
-        intent.putExtra("parent", parent)
         startActivityForResult(
             intent,
             RC_CHORE_DETAILS
@@ -101,17 +92,14 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_CHORE_DETAILS) {
-            if (resultCode == Activity.RESULT_OK) {
-                parent = data?.extras?.get("parent") as Parent?
-                setupUI()
-            }
+            if (resultCode == Activity.RESULT_OK) setupUI()
         }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun addChore(dialog: DialogFragment, chore: Chore) {
-        parent?.addChore(chore) {
+        UserManager.parent?.addChore(chore) {
             if (it != null) {
                 adapter.notifyDataSetChanged()
             } else {

@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.card_view_chore.view.*
 
 class ChoreRecyclerAdapter(
     private val chores: List<Chore>,
-    private val fragment: ParentChoresFragment
+    private val listener: ChoreHolder.ChoreHolderListener
 ) :
     RecyclerView.Adapter<ChoreRecyclerAdapter.ChoreHolder>() {
 
@@ -22,7 +22,7 @@ class ChoreRecyclerAdapter(
         val inflatedView = parent.inflate(R.layout.card_view_chore_parent, false)
         return ChoreHolder(
             inflatedView,
-            fragment
+            listener
         )
     }
 
@@ -33,10 +33,14 @@ class ChoreRecyclerAdapter(
         holder.bindChore(itemChore)
     }
 
-    class ChoreHolder(private val v: View, val fragment: ParentChoresFragment) :
+    class ChoreHolder(private val v: View, private val listener: ChoreHolderListener) :
         RecyclerView.ViewHolder(v), View.OnClickListener {
 
         private var chore: Chore? = null
+
+        interface ChoreHolderListener {
+            fun openDetails(chore: Chore)
+        }
 
         init {
             v.setOnClickListener(this)
@@ -51,7 +55,7 @@ class ChoreRecyclerAdapter(
         }
 
         override fun onClick(v: View) {
-            fragment.openDetails(chore!!)
+            listener.openDetails(chore!!)
         }
     }
 }

@@ -9,10 +9,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.models.ParentDAO
 import ch.bbbaden.choreapp.parent.ParentActivity
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import kotlinx.android.synthetic.main.fragment_sign_up.*
 
@@ -26,12 +26,8 @@ class SignUpFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_sign_up, container, false)
     }
 
-    private lateinit var auth: FirebaseAuth
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        auth = FirebaseAuth.getInstance()
 
         signUpBtn.setOnClickListener {
             when {
@@ -77,14 +73,15 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    fun signUp(email: String, password: String, first: String, last: String?) {
-        auth.createUserWithEmailAndPassword(email, password)
+    private fun signUp(email: String, password: String, first: String, last: String?) {
+        UserManager.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(activity!!) { task ->
-                if (task.isSuccessful && auth.currentUser != null) {
-                    val user = auth.currentUser!!
+                if (task.isSuccessful && UserManager.auth.currentUser != null) {
+                    val user = UserManager.auth.currentUser!!
                     val parent = Parent(user.uid, email, first, last)
 
                     ParentDAO().addParent(parent)
+                    UserManager.parent = parent
 
                     Toast.makeText(
                         activity, "Successfully signed up with ${user.email}!",
@@ -93,7 +90,6 @@ class SignUpFragment : Fragment() {
 
                     activity?.let {
                         val intent = Intent(it.applicationContext, ParentActivity::class.java)
-                        intent.putExtra("user", parent)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                         it.startActivity(intent)
                     }

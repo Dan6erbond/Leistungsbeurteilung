@@ -11,20 +11,13 @@ import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.models.Parent
-import ch.bbbaden.choreapp.models.ParentDAO
 import ch.bbbaden.choreapp.parent.child.ChildRecyclerAdapter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_parent_profile.*
 
 class ParentProfileFragment : Fragment() {
-
-    private var parent: Parent? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parent = arguments?.get("user") as Parent?
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,13 +53,14 @@ class ParentProfileFragment : Fragment() {
         linearLayoutManager = LinearLayoutManager(context)
         recyclerViewChildren.layoutManager = linearLayoutManager
 
-        if (parent != null) {
+        UserManager.parent?.let {
             setupUI()
-        } else {
-            ParentDAO().getParent(auth.currentUser!!.uid) {
-                it?.let {
-                    parent = it
+        } ?: run {
+            UserManager.getUser {
+                if (it is Parent) {
                     setupUI()
+                } else {
+                    TODO("Show error")
                 }
             }
         }
@@ -75,11 +69,11 @@ class ParentProfileFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
         adapter =
-            ChildRecyclerAdapter(parent!!.childrenL)
-        parentImg.setImageBitmap(parent?.getQRCode(smallerDimension))
-        nameTxt.text = "${parent?.first} ${parent?.last ?: ""}"
-        emailTxt.text = parent?.email
-        parent?.fetchChildren {
+            ChildRecyclerAdapter(UserManager.parent!!.childrenL)
+        parentImg.setImageBitmap(UserManager.parent?.getQRCode(smallerDimension))
+        nameTxt.text = "${UserManager.parent?.first} ${UserManager.parent?.last ?: ""}"
+        emailTxt.text = UserManager.parent?.email
+        UserManager.parent?.fetchChildren {
             adapter.notifyDataSetChanged()
         }
         recyclerViewChildren.adapter = adapter

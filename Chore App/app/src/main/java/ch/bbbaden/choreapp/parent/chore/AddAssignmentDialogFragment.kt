@@ -6,18 +6,17 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
-import ch.bbbaden.choreapp.models.Parent
+import ch.bbbaden.choreapp.models.Repeat
 import ch.bbbaden.choreapp.parent.child.ChildArrayAdapter
 import kotlinx.android.synthetic.main.dialog_fragment_add_assignment.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddAssignmentDialogFragment(
-    private val listener: AddAssignmentDialogListener,
-    private val parent: Parent
-) : DialogFragment() {
+class AddAssignmentDialogFragment(private val listener: AddAssignmentDialogListener) :
+    DialogFragment() {
 
     interface AddAssignmentDialogListener {
         fun addAssignment(
@@ -36,7 +35,7 @@ class AddAssignmentDialogFragment(
             val childArrayAdapter =
                 ChildArrayAdapter(
                     view.context,
-                    parent.childrenL
+                    UserManager.parent!!.childrenL
                 )
             view.childSpinner.adapter = childArrayAdapter
 
@@ -48,7 +47,7 @@ class AddAssignmentDialogFragment(
             val unitAdapter = ArrayAdapter(
                 view.context,
                 R.layout.spinner_item_selected,
-                Assignment.repeatValues
+                Repeat.units
             )
             unitAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
             view.repeatUnit.adapter = unitAdapter
@@ -63,9 +62,9 @@ class AddAssignmentDialogFragment(
                         this,
                         Assignment(
                             (view.childSpinner.selectedItem as Child).userId,
-                            hashMapOf<String, Any>(
-                                "value" to view.repeatValue.text.toString(),
-                                "unit" to view.repeatUnit.selectedItem as String
+                            Repeat(
+                                view.repeatUnit.selectedItem as String,
+                                view.repeatValue.text.toString().toInt()
                             ),
                             startDate
                         )

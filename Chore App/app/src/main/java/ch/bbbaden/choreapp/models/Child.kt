@@ -5,7 +5,6 @@ import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import com.google.firebase.firestore.DocumentId
 import com.google.zxing.WriterException
-import java.io.Serializable
 
 data class Child(
     @DocumentId val userId: String? = null,
@@ -13,7 +12,7 @@ data class Child(
     val last: String? = null,
     var parentId: String? = null,
     val chores: ArrayList<Chore> = arrayListOf()
-) : Serializable {
+) {
 
     var parent: Parent? = null
         set(value) {

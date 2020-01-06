@@ -23,7 +23,7 @@ class ChildDAO {
             }
     }
 
-    fun getChild(parentId: String, userId: String, callback: ((Child?) -> Unit)? = null) {
+    private fun getChild(parentId: String, userId: String, callback: ((Child?) -> Unit)? = null) {
         db.collection("users").document(parentId).collection("children").document(userId)
             .get()
             .addOnSuccessListener { ds ->

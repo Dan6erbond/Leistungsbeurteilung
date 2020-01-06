@@ -16,14 +16,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.child.ChildActivity
-import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.models.ChildDAO
-import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.models.ParentDAO
 import ch.bbbaden.choreapp.parent.ParentActivity
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
@@ -46,7 +44,6 @@ class QRFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_qr, container, false)
     }
 
-    private lateinit var auth: FirebaseAuth
     private lateinit var functions: FirebaseFunctions
 
     @androidx.camera.core.ExperimentalGetImage
@@ -64,7 +61,6 @@ class QRFragment : Fragment() {
 
         qr_progressBar.isVisible = false
 
-        auth = FirebaseAuth.getInstance()
         functions = FirebaseFunctions.getInstance()
     }
 
@@ -121,24 +117,6 @@ class QRFragment : Fragment() {
             }
     }
 
-    private fun startParentActivity(parent: Parent) {
-        activity?.let {
-            val intent = Intent(it, ParentActivity::class.java)
-            intent.putExtra("user", parent)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            it.startActivity(intent)
-        }
-    }
-
-    private fun startChildActivity(child: Child) {
-        activity?.let {
-            val intent = Intent(it, ChildActivity::class.java)
-            intent.putExtra("user", child)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            it.startActivity(intent)
-        }
-    }
-
     private fun signInQR(rawValue: String?, callback: ((success: Boolean) -> Unit)? = null) {
         val regex = Regex("(parentuid|childuid):(\\w+)")
 
@@ -147,18 +125,23 @@ class QRFragment : Fragment() {
 
             matchResult?.let { mr ->
                 getToken(mr.groupValues[2]).addOnSuccessListener { t ->
-                    auth.signInWithCustomToken(t).addOnSuccessListener {
+                    UserManager.auth.signInWithCustomToken(t).addOnSuccessListener {
                         when (matchResult.groupValues[1]) {
                             "parentuid" -> {
                                 ParentDAO().getParent(mr.groupValues[2]) {
                                     if (it != null) {
                                         Toast.makeText(
                                             activity!!,
-                                            "Successfully logged in as ${auth.currentUser?.email}.",
+                                            "Successfully logged in as ${UserManager.auth.currentUser?.email}.",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         callback?.invoke(true)
-                                        startParentActivity(it)
+                                        UserManager.parent = it
+                                        activity?.let { fa ->
+                                            val intent = Intent(fa, ParentActivity::class.java)
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            fa.startActivity(intent)
+                                        }
                                     } else {
                                         callback?.invoke(false)
                                     }
@@ -169,11 +152,16 @@ class QRFragment : Fragment() {
                                     if (it != null) {
                                         Toast.makeText(
                                             activity!!,
-                                            "Successfully logged in as child ${auth.currentUser?.uid}.",
+                                            "Successfully logged in as child ${UserManager.auth.currentUser?.uid}.",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         callback?.invoke(true)
-                                        startChildActivity(it)
+                                        UserManager.child = it
+                                        activity?.let { fa ->
+                                            val intent = Intent(fa, ChildActivity::class.java)
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            fa.startActivity(intent)
+                                        }
                                     } else {
                                         callback?.invoke(false)
                                     }

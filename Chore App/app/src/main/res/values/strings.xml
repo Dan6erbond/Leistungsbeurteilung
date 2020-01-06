@@ -146,4 +146,6 @@
     <string name="remove_chore_confirmation">Are you sure you want to remove this chore?</string>
     <string name="error_adding_chore">Error adding chore!</string>
     <string name="remove_assignment_confirmation">Are you sure you want to remove this assignment?</string>
+    <string name="scan_this_qr_code_on_your_child_s_phone">Scan this QR code on your child\'s phone</string>
+    <string name="done">Done</string>
 </resources>

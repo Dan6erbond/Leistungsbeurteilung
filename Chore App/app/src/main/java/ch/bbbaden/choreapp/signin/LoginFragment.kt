@@ -7,21 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import ch.bbbaden.choreapp.R
-import ch.bbbaden.choreapp.barcode.BarcodeCaptureActivity
 import ch.bbbaden.choreapp.parent.ParentActivity
-import com.firebase.ui.auth.IdpResponse
-import com.google.android.gms.common.api.CommonStatusCodes
-import com.google.android.gms.vision.barcode.Barcode
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.android.synthetic.main.fragment_login.*
-
-private const val RC_SIGN_IN = 0
-private const val RC_QR_SIGN_IN = 1
 
 class LoginFragment : Fragment() {
 
@@ -43,18 +35,22 @@ class LoginFragment : Fragment() {
         progressBar.isInvisible = true
 
         signInBtn.setOnClickListener {
-            if (emailTxt.text.isNullOrEmpty()) {
-                Toast.makeText(
-                    activity, "Please enter your email.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else if (passwordTxt.text.isNullOrEmpty()) {
-                Toast.makeText(
-                    activity, "Please enter your password.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                signIn(emailTxt.text.toString(), passwordTxt.text.toString())
+            when {
+                emailTxt.text.isNullOrEmpty() -> {
+                    Toast.makeText(
+                        activity, "Please enter your email.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                passwordTxt.text.isNullOrEmpty() -> {
+                    Toast.makeText(
+                        activity, "Please enter your password.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> {
+                    signIn(emailTxt.text.toString(), passwordTxt.text.toString())
+                }
             }
         }
     }
@@ -67,12 +63,17 @@ class LoginFragment : Fragment() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
 
+
                     Toast.makeText(
                         activity, "Successfully signed in as ${user?.email}!",
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    switchToMain()
+                    activity!!.let {
+                        val intent = Intent(it, ParentActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        it.startActivity(intent)
+                    }
                 } else {
                     Log.e(
                         this::class.simpleName,
@@ -95,44 +96,5 @@ class LoginFragment : Fragment() {
                     }
                 }
             }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RC_SIGN_IN) {
-            val response = IdpResponse.fromResultIntent(data)
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                switchToMain()
-            } else {
-                Log.e(
-                    this::class.simpleName,
-                    response?.error?.message ?: response?.error.toString()
-                )
-            }
-        } else if (requestCode == RC_QR_SIGN_IN) {
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-                    progressBar.isInvisible = false
-
-                    val barcode =
-                        data.getParcelableExtra<Barcode>(BarcodeCaptureActivity.BarcodeObject)
-
-
-                } else {
-                    println("No barcode captured.")
-                }
-            } else
-                Log.e(this::class.simpleName, CommonStatusCodes.getStatusCodeString(resultCode))
-
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    private fun switchToMain() {
-        activity?.let {
-            val intent = Intent(it, ParentActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            it.startActivity(intent)
-        }
     }
 }

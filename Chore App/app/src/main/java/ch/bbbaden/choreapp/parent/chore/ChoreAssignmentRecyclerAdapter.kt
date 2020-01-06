@@ -3,7 +3,6 @@ package ch.bbbaden.choreapp.parent.chore
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.ActionBar
-import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -11,10 +10,11 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
-import ch.bbbaden.choreapp.models.Parent
+import ch.bbbaden.choreapp.models.Repeat
 import ch.bbbaden.choreapp.parent.child.ChildArrayAdapter
 import kotlinx.android.synthetic.main.card_chore_assignment.view.*
 
@@ -75,9 +75,6 @@ class ChoreAssignmentRecyclerAdapter(
             this.assignment = assignment
             view.startDate.setText(assignment.getDisplayTime(assignment.startDate))
 
-            // val chore = (view.context as Activity).intent.extras?.get("chore") as Chore?
-            val parent = (view.context as Activity).intent.extras?.get("parent") as Parent?
-
             view.choreAssignmentTitleButton.setOnClickListener {
                 toggleDetails()
             }
@@ -97,20 +94,20 @@ class ChoreAssignmentRecyclerAdapter(
             val childArrayAdapter =
                 ChildArrayAdapter(
                     view.context,
-                    parent!!.childrenL
+                    UserManager.parent!!.childrenL
                 )
             view.childSpinner.adapter = childArrayAdapter
 
 
             var childIndex = 0
-            for (i in parent!!.childrenL.indices) {
-                if (parent!!.childrenL[i].userId == assignment.assignedTo) {
+            for (i in UserManager.parent!!.childrenL.indices) {
+                if (UserManager.parent!!.childrenL[i].userId == assignment.assignedTo) {
                     childIndex = i
                     break
                 }
             }
 
-            view.childName.text = parent!!.childrenL[childIndex].first
+            view.childName.text = UserManager.parent!!.childrenL[childIndex].first
             view.childSpinner.setSelection(childIndex)
 
             view.childSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -131,19 +128,19 @@ class ChoreAssignmentRecyclerAdapter(
 
             }
 
-            view.repeatValue.setText(assignment.repeat?.get("value")!!.toString())
+            view.repeatValue.setText(assignment.repeat?.value!!.toString())
 
             val unitAdapter = ArrayAdapter(
                 view.context,
                 R.layout.spinner_item_selected,
-                Assignment.repeatValues
+                Repeat.units
             )
             unitAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
             view.repeatUnit.adapter = unitAdapter
 
             var unitIndex = 0
-            for (i in Assignment.repeatValues.indices) {
-                if (Assignment.repeatValues[i] == assignment.repeat["unit"]!!.toString()) {
+            for (i in Repeat.units.indices) {
+                if (Repeat.units[i] == assignment.repeat.unit!!) {
                     unitIndex = i
                     break
                 }
@@ -162,8 +159,8 @@ class ChoreAssignmentRecyclerAdapter(
                     position: Int,
                     id: Long
                 ) {
-                    val unit = parent!!.getItemAtPosition(position)
-                    assignment.repeat["unit"] = unit
+                    val unit = parent!!.getItemAtPosition(position) as String
+                    assignment.repeat.unit = unit
                 }
 
             }

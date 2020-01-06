@@ -8,18 +8,14 @@ import java.util.*
 
 data class Assignment(
     var assignedTo: String? = null,
-    val repeat: HashMap<String, Any>? = hashMapOf()
+    val repeat: Repeat? = null
 ) : Serializable {
 
     lateinit var startDate: Date
 
-    companion object {
-        val repeatValues = listOf("day", "week", "month", "year")
-    }
-
     constructor(
         assignedTo: String? = null,
-        repeat: HashMap<String, Any>? = hashMapOf(),
+        repeat: Repeat? = null,
         startDate: Timestamp? = null
     ) : this(assignedTo, repeat) {
         this.startDate = startDate!!.toDate()
@@ -27,7 +23,7 @@ data class Assignment(
 
     constructor(
         assignedTo: String? = null,
-        repeat: HashMap<String, Any>? = hashMapOf(),
+        repeat: Repeat? = null,
         startDate: Date? = null
     ) : this(assignedTo, repeat) {
         this.startDate = startDate!!
@@ -43,8 +39,8 @@ data class Assignment(
                 return nextDate
             }
             repeat != null -> {
-                val value = (repeat["value"] as Long).toInt()
-                when (repeat["unit"]) {
+                val value = repeat.value!!
+                when (repeat.unit!!) {
                     "day" -> return addToDate(nextDate, currentDate, Calendar.DATE, value)
                     "week" -> return addToDate(nextDate, currentDate, Calendar.DATE, value * 7)
                     "month" -> return addToDate(nextDate, currentDate, Calendar.MONTH, value)
@@ -77,10 +73,7 @@ data class Assignment(
     fun getData(): HashMap<String, *> {
         return hashMapOf(
             "assignedTo" to assignedTo,
-            "repeat" to hashMapOf(
-                "unit" to repeat?.get("unit"),
-                "value" to repeat?.get("value")
-            ),
+            "repeat" to repeat,
             "startDate" to Timestamp(startDate)
         )
     }

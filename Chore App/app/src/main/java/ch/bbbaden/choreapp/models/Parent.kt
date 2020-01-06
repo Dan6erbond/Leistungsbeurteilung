@@ -5,7 +5,6 @@ import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import com.google.firebase.firestore.DocumentId
 import com.google.zxing.WriterException
-import java.io.Serializable
 
 data class Parent (
     @DocumentId val userId: String? = null,
@@ -15,7 +14,7 @@ data class Parent (
     val children: List<String> = arrayListOf(),
     val childrenL: ArrayList<Child> = arrayListOf(),
     val chores: ArrayList<Chore> = arrayListOf()
-) : Serializable {
+) {
 
     fun getQRCode(smallerDimension: Int): Bitmap {
         val content = "parentuid:$userId"
