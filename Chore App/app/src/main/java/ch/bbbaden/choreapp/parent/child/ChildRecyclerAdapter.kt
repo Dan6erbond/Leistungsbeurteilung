@@ -64,10 +64,13 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
             // view.childImage.setImageResource(R.drawable.ic_menu_camera)
             view.childName.text = child.first
 
-            view.childQR.setImageBitmap(child.getQRCode(smallerDimension))
-            view.childQR.setOnClickListener {
+            view.qrCode.setImageBitmap(child.getQRCode(smallerDimension))
+            view.qrCode.setOnClickListener {
                 val dialog =
-                    QRDialogFragment(child)
+                    QRDialogFragment(
+                        child.getQRCode(smallerDimension),
+                        view.context.getString(R.string.scan_this_qr_code_on_your_child_s_phone)
+                    )
                 dialog.show(
                     (view.context as AppCompatActivity).supportFragmentManager,
                     "ChildQRDialogFragment"

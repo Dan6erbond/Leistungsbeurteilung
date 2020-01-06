@@ -44,7 +44,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/childQR"
+            android:id="@+id/qrCode"
             android:layout_width="48dp"
             android:layout_height="0dp"
             android:layout_marginEnd="8dp"
