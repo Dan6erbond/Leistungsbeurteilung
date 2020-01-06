@@ -84,9 +84,10 @@ class ChoreAssignmentRecyclerAdapter(
 
             view.choreAssignmentTitleButton.setOnLongClickListener {
                 val dialog =
-                    ConfirmationDialogFragment(view.context.getString(R.string.remove_assignment_confirmation)) {
-                        listener.deleteAssignment(assignment)
-                    }
+                    ConfirmationDialogFragment(view.context.getString(R.string.remove_assignment_confirmation))
+                        .setPositiveButtonListener {
+                            listener.deleteAssignment(assignment)
+                        }
                 dialog.show(
                     (view.context as AppCompatActivity).supportFragmentManager,
                     "DeleteAssignmentDialogFragment"

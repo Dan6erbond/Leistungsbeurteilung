@@ -86,9 +86,10 @@ class ChoreDetailActivity : AppCompatActivity(),
         }
 
         R.id.action_delete -> {
-            val dialog = ConfirmationDialogFragment(getString(R.string.remove_chore_confirmation)) {
-                deleteChore(chore!!)
-            }
+            val dialog = ConfirmationDialogFragment(getString(R.string.remove_chore_confirmation))
+                .setPositiveButtonListener {
+                    deleteChore(chore!!)
+                }
             dialog.show(supportFragmentManager, "DeleteChoreDialogFragment")
             true
         }
