@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
+import ch.bbbaden.choreapp.dialogs.ConfirmationDialogFragment
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
@@ -20,7 +21,7 @@ import kotlinx.android.synthetic.main.card_chore_assignment.view.*
 
 class ChoreAssignmentRecyclerAdapter(
     private val assignments: List<Assignment>,
-    private val deleteAssignmentDialogListener: DeleteAssignmentDialogFragment.DeleteAssignmentDialogListener
+    private val listener: AssignmentHolder.AssignmentHolderListener
 ) :
     RecyclerView.Adapter<ChoreAssignmentRecyclerAdapter.AssignmentHolder>() {
 
@@ -29,10 +30,7 @@ class ChoreAssignmentRecyclerAdapter(
         viewType: Int
     ): AssignmentHolder {
         val inflatedView = parent.inflate(R.layout.card_chore_assignment, false)
-        return AssignmentHolder(
-            inflatedView,
-            deleteAssignmentDialogListener
-        )
+        return AssignmentHolder(inflatedView, listener)
     }
 
     override fun getItemCount() = assignments.size
@@ -44,8 +42,12 @@ class ChoreAssignmentRecyclerAdapter(
 
     class AssignmentHolder(
         private val view: View,
-        private val deleteAssignmentDialogListener: DeleteAssignmentDialogFragment.DeleteAssignmentDialogListener
+        private val listener: AssignmentHolderListener
     ) : RecyclerView.ViewHolder(view) {
+
+        interface AssignmentHolderListener {
+            fun deleteAssignment(assignment: Assignment)
+        }
 
         private var assignment: Assignment? = null
         private var detailsOpen = false
@@ -81,10 +83,10 @@ class ChoreAssignmentRecyclerAdapter(
             }
 
             view.choreAssignmentTitleButton.setOnLongClickListener {
-                val dialog = DeleteAssignmentDialogFragment(
-                    deleteAssignmentDialogListener,
-                    assignment
-                )
+                val dialog =
+                    ConfirmationDialogFragment(view.context.getString(R.string.remove_assignment_confirmation)) {
+                        listener.deleteAssignment(assignment)
+                    }
                 dialog.show(
                     (view.context as AppCompatActivity).supportFragmentManager,
                     "DeleteAssignmentDialogFragment"

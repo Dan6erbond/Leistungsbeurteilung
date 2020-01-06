@@ -12,15 +12,15 @@ import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
+import ch.bbbaden.choreapp.dialogs.ConfirmationDialogFragment
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Chore
 import kotlinx.android.synthetic.main.activity_chore_detail.*
 
 
 class ChoreDetailActivity : AppCompatActivity(),
-    DeleteChoreDialogFragment.DeleteChoreDialogListener,
     AddAssignmentDialogFragment.AddAssignmentDialogListener,
-    DeleteAssignmentDialogFragment.DeleteAssignmentDialogListener {
+    ChoreAssignmentRecyclerAdapter.AssignmentHolder.AssignmentHolderListener {
 
     private var chore: Chore? = null
 
@@ -86,7 +86,9 @@ class ChoreDetailActivity : AppCompatActivity(),
         }
 
         R.id.action_delete -> {
-            val dialog = DeleteChoreDialogFragment(this, chore!!)
+            val dialog = ConfirmationDialogFragment(getString(R.string.remove_chore_confirmation)) {
+                deleteChore(chore!!)
+            }
             dialog.show(supportFragmentManager, "DeleteChoreDialogFragment")
             true
         }
@@ -106,13 +108,14 @@ class ChoreDetailActivity : AppCompatActivity(),
         }
     }
 
-    override fun deleteChore(dialog: DialogFragment, chore: Chore) {
+    private fun deleteChore(chore: Chore) {
         slideSavingUp()
 
         UserManager.parent?.deleteChore(chore) {
             if (it) {
                 val intent = Intent()
                 setResult(Activity.RESULT_OK, intent)
+                finish()
             }
         }
     }
@@ -136,10 +139,7 @@ class ChoreDetailActivity : AppCompatActivity(),
         }
     }
 
-    override fun deleteAssignment(
-        dialog: DialogFragment,
-        assignment: Assignment
-    ) {
+    override fun deleteAssignment(assignment: Assignment) {
         chore!!.assignments.remove(assignment)
         save {
             if (it) setupUI()

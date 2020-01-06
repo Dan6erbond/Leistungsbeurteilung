@@ -6,7 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import ch.bbbaden.choreapp.R
 
-class ConfirmationDialogFragment(private val callback: () -> Unit, private val title: String) : DialogFragment() {
+class ConfirmationDialogFragment(private val title: String, private val callback: () -> Unit) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
