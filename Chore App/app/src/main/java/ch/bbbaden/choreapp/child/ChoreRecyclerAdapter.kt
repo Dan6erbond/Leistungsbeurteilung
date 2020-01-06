@@ -30,13 +30,13 @@ class ChoreRecyclerAdapter(private val chores: List<Chore>) :
         holder.bindChore(itemChore)
     }
 
-    class ChoreHolder(v: View) : RecyclerView.ViewHolder(v), View.OnClickListener {
+    class ChoreHolder(private val view: View) : RecyclerView.ViewHolder(view),
+        View.OnClickListener {
 
-        private var view: View = v
         private var chore: Chore? = null
 
         init {
-            v.setOnClickListener(this)
+            view.setOnClickListener(this)
         }
 
         @SuppressLint("SetTextI18n")

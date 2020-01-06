@@ -30,7 +30,8 @@ class ChoreAssignmentRecyclerAdapter(
     ): AssignmentHolder {
         val inflatedView = parent.inflate(R.layout.card_chore_assignment, false)
         return AssignmentHolder(
-            inflatedView
+            inflatedView,
+            deleteAssignmentDialogListener
         )
     }
 
@@ -38,14 +39,14 @@ class ChoreAssignmentRecyclerAdapter(
 
     override fun onBindViewHolder(holder: AssignmentHolder, position: Int) {
         val assignment = assignments[position]
-        holder.deleteAssignmentDialogListener = deleteAssignmentDialogListener
         holder.bindItem(assignment)
     }
 
-    class AssignmentHolder(v: View) : RecyclerView.ViewHolder(v) {
+    class AssignmentHolder(
+        private val view: View,
+        private val deleteAssignmentDialogListener: DeleteAssignmentDialogFragment.DeleteAssignmentDialogListener
+    ) : RecyclerView.ViewHolder(view) {
 
-        lateinit var deleteAssignmentDialogListener: DeleteAssignmentDialogFragment.DeleteAssignmentDialogListener
-        private var view: View = v
         private var assignment: Assignment? = null
         private var detailsOpen = false
 

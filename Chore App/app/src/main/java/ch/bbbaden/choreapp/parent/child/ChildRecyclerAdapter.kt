@@ -36,9 +36,9 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         holder.bindChore(itemChore)
     }
 
-    class ChildHolder(v: View) : RecyclerView.ViewHolder(v), View.OnClickListener {
+    class ChildHolder(private val view: View) : RecyclerView.ViewHolder(view),
+        View.OnClickListener {
 
-        private var view: View = v
         private var child: Child? = null
 
         private val smallerDimension: Int
@@ -55,7 +55,7 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
             }
 
         init {
-            v.setOnClickListener(this)
+            view.setOnClickListener(this)
         }
 
         @SuppressLint("SetTextI18n")
