@@ -9,7 +9,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import ch.bbbaden.choreapp.R
-import kotlinx.android.synthetic.main.card_view_child.view.qrCode
+import kotlinx.android.synthetic.main.card_view_parent_child.view.qrCode
 import kotlinx.android.synthetic.main.dialog_fragment_qr.view.*
 
 class QRDialogFragment(private val bitmap: Bitmap, private val title: String) : DialogFragment() {

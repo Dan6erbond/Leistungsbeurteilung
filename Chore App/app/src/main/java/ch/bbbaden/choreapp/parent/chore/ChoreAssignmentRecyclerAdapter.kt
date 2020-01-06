@@ -90,7 +90,7 @@ class ChoreAssignmentRecyclerAdapter(
                         }
                 dialog.show(
                     (view.context as AppCompatActivity).supportFragmentManager,
-                    "DeleteAssignmentDialogFragment"
+                    "ConfirmationDialogFragment"
                 )
                 true
             }
@@ -101,7 +101,6 @@ class ChoreAssignmentRecyclerAdapter(
                     UserManager.parent!!.childrenL
                 )
             view.childSpinner.adapter = childArrayAdapter
-
 
             var childIndex = 0
             for (i in UserManager.parent!!.childrenL.indices) {

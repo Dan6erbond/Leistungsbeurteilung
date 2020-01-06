@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Chore
-import kotlinx.android.synthetic.main.card_view_chore.view.*
+import kotlinx.android.synthetic.main.card_view_child_chore.view.*
 
 class ChoreRecyclerAdapter(
     private val chores: List<Chore>,
@@ -19,7 +19,7 @@ class ChoreRecyclerAdapter(
         parent: ViewGroup,
         viewType: Int
     ): ChoreHolder {
-        val inflatedView = parent.inflate(R.layout.card_view_chore_parent, false)
+        val inflatedView = parent.inflate(R.layout.card_view_parent_chore, false)
         return ChoreHolder(
             inflatedView,
             listener

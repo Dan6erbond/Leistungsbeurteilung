@@ -90,7 +90,7 @@ class ChoreDetailActivity : AppCompatActivity(),
                 .setPositiveButtonListener {
                     deleteChore(chore!!)
                 }
-            dialog.show(supportFragmentManager, "DeleteChoreDialogFragment")
+            dialog.show(supportFragmentManager, "ConfirmationDialogFragment")
             true
         }
 

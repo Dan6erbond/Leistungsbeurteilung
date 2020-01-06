@@ -13,7 +13,7 @@ import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.dialogs.QRDialogFragment
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Child
-import kotlinx.android.synthetic.main.card_view_child.view.*
+import kotlinx.android.synthetic.main.card_view_parent_child.view.*
 
 
 class ChildRecyclerAdapter(private val children: List<Child>) :
@@ -23,7 +23,7 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         parent: ViewGroup,
         viewType: Int
     ): ChildHolder {
-        val inflatedView = parent.inflate(R.layout.card_view_child, false)
+        val inflatedView = parent.inflate(R.layout.card_view_parent_child, false)
         return ChildHolder(
             inflatedView
         )
@@ -64,16 +64,17 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
             // view.childImage.setImageResource(R.drawable.ic_menu_camera)
             view.childName.text = child.first
 
-            view.qrCode.setImageBitmap(child.getQRCode(smallerDimension))
+            val qrCode = child.getQRCode(smallerDimension)
+            view.qrCode.setImageBitmap(qrCode)
             view.qrCode.setOnClickListener {
                 val dialog =
                     QRDialogFragment(
-                        child.getQRCode(smallerDimension),
-                        view.context.getString(R.string.scan_this_qr_code_on_your_child_s_phone)
+                        qrCode,
+                        view.context.getString(R.string.scan_this_qr_code_on_your_childs_phone)
                     )
                 dialog.show(
                     (view.context as AppCompatActivity).supportFragmentManager,
-                    "ChildQRDialogFragment"
+                    "QRDialogFragment"
                 )
             }
         }

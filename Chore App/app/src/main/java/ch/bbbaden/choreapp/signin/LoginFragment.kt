@@ -63,7 +63,6 @@ class LoginFragment : Fragment() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
 
-
                     Toast.makeText(
                         activity, "Successfully signed in as ${user?.email}!",
                         Toast.LENGTH_SHORT
@@ -79,6 +78,8 @@ class LoginFragment : Fragment() {
                         this::class.simpleName,
                         task.exception?.message ?: task.exception.toString()
                     )
+                    progressBar.isInvisible = true
+
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                         Toast.makeText(
                             activity?.applicationContext, "Invalid email or password.",
@@ -89,10 +90,6 @@ class LoginFragment : Fragment() {
                             activity?.applicationContext, "Authentication failed.",
                             Toast.LENGTH_SHORT
                         ).show()
-                        Log.e(
-                            this::class.simpleName,
-                            task.exception?.message ?: task.exception.toString()
-                        )
                     }
                 }
             }
