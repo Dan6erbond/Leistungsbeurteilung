@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
+import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.signin.SignInActivity
 import kotlinx.android.synthetic.main.activity_parent.*
 
@@ -21,17 +22,26 @@ class ParentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_parent)
         setSupportActionBar(parentToolbar)
 
+        UserManager.parent?.let {
+            setupUI()
+        } ?: run {
+            UserManager.getUser {
+                if (it is Parent) setupUI()
+                else TODO("Show error")
+            }
+        }
+    }
+
+    private fun setupUI() {
         val host: NavHostFragment = parentFragment as NavHostFragment? ?: return
         val navController = host.navController
 
-        UserManager.parent?.let {
-            navController.setGraph(R.navigation.parent_graph)
-            parentNavigation.setupWithNavController(navController)
+        navController.setGraph(R.navigation.parent_graph)
+        parentNavigation.setupWithNavController(navController)
 
-            parentNavigation.setOnNavigationItemSelectedListener { menuItem ->
-                parentFragment.findNavController().navigate(menuItem.itemId)
-                true
-            }
+        parentNavigation.setOnNavigationItemSelectedListener { menuItem ->
+            parentFragment.findNavController().navigate(menuItem.itemId)
+            true
         }
     }
 

@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.models.Child
@@ -14,16 +16,10 @@ import kotlinx.android.synthetic.main.activity_child.*
 
 class ChildActivity : AppCompatActivity() {
 
-    private lateinit var linearLayoutManager: LinearLayoutManager
-    private lateinit var adapter: ChoreRecyclerAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_child)
         setSupportActionBar(childToolbar)
-
-        linearLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = linearLayoutManager
 
         UserManager.child?.let {
             setupUI()
@@ -36,16 +32,15 @@ class ChildActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        adapter = ChoreRecyclerAdapter(UserManager.child!!.chores)
-        UserManager.child!!.fetchChores {
-            adapter.notifyDataSetChanged()
-        }
-        recyclerView.adapter = adapter
-        swipeRefreshLayout.setOnRefreshListener {
-            UserManager.child!!.fetchChores {
-                adapter.notifyDataSetChanged()
-                swipeRefreshLayout.isRefreshing = false
-            }
+        val host: NavHostFragment = childFragment as NavHostFragment? ?: return
+        val navController = host.navController
+
+        navController.setGraph(R.navigation.child_graph)
+        childNavigation.setupWithNavController(navController)
+
+        childNavigation.setOnNavigationItemSelectedListener { menuItem ->
+            childFragment.findNavController().navigate(menuItem.itemId)
+            true
         }
     }
 
