@@ -10,9 +10,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
+import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.dialogs.QRDialogFragment
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Chore
+import com.google.firebase.Timestamp
 import kotlinx.android.synthetic.main.card_view_child_chore.view.*
 
 class ChoreRecyclerAdapter(private val chores: List<Chore>) :
@@ -62,7 +64,10 @@ class ChoreRecyclerAdapter(private val chores: List<Chore>) :
             this.chore = chore
             // view.choreImage.setImageResource(R.drawable.ic_menu_camera)
             view.choreName.text = chore.name
-            view.choreTime.text = chore.getDisplayTime()
+
+            val assignment = chore.getAssignment(UserManager.child!!)
+            view.choreTime.text = assignment?.getDisplayTime(Timestamp(assignment.getNextDate()!!))
+
             view.choreDescription.text = chore.description
 
             val qrCode = chore.getQRCode(smallerDimension)

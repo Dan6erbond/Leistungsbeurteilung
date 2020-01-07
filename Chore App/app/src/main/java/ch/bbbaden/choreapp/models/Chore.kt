@@ -3,7 +3,6 @@ package ch.bbbaden.choreapp.models
 import android.graphics.Bitmap
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Exclude
@@ -17,10 +16,6 @@ class Chore(
     val assignments: ArrayList<Assignment> = arrayListOf(),
     var parent: DocumentReference? = null
 ) {
-
-    // TODO: Get rid of this for cleanliness
-    @get:Exclude
-    var child: Child? = null
 
     @get:Exclude
     val documentReference: DocumentReference
@@ -41,20 +36,10 @@ class Chore(
     }
 
     @Exclude
-    private fun getAssignment(): Assignment? {
+    fun getAssignment(child: Child): Assignment? {
         for (assignment in assignments) {
             if (assignment.assignedTo?.id == child?.id) {
                 return assignment
-            }
-        }
-        return null
-    }
-
-    @Exclude
-    fun getDisplayTime(): String? {
-        getAssignment()?.let { assignment ->
-            assignment.getNextDate()?.let {
-                return assignment.getDisplayTime(Timestamp(it))
             }
         }
         return null

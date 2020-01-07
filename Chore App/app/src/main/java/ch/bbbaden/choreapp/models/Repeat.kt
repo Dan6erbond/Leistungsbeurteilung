@@ -8,13 +8,6 @@ data class Repeat(var unit: String? = null, val value: Int? = null) : Serializab
         val units = listOf("day", "week", "month", "year")
     }
 
-    enum class RepeatUnit(val text: String? = null) {
-        DAY("day"),
-        WEEK("week"),
-        MONTH("month"),
-        YEAR("year")
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

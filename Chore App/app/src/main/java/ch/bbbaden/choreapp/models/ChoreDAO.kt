@@ -21,7 +21,6 @@ class ChoreDAO {
                         val assignedTo = assignment.assignedTo?.id == child.id
                         val nextAssignmentExists = assignment.getNextDate() != null
                         if (assignedTo && nextAssignmentExists) {
-                            chore.child = child
                             chores.add(chore)
                             break
                         }
