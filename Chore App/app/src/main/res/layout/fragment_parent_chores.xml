@@ -14,7 +14,6 @@
         android:paddingBottom="8dp"
         android:scrollbars="vertical" />
 
-    <!--FAB does not render correctly in Android Studio preview-->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddChore"
         android:layout_width="wrap_content"
