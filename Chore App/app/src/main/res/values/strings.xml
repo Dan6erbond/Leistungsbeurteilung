@@ -149,4 +149,5 @@
     <string name="scan_this_qr_code_on_your_childs_phone">Scan this QR code on your child\'s phone.</string>
     <string name="done">Done</string>
     <string name="scan_this_qr_code_on_your_parents_phone">Scan this QR code on your parent\'s phone to confirm you have completed the chore.</string>
+    <string name="add_child">Add Child</string>
 </resources>

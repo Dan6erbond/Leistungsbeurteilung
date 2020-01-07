@@ -33,10 +33,14 @@ data class Child(
     }
 
     fun fetchChores(callback: ((ArrayList<Chore>) -> Unit)? = null) {
-        ChoreDAO().getChores(this) {
-            chores.clear()
-            chores.addAll(it!!)
-            callback?.invoke(it)
+        if (chores.isEmpty()) {
+            ChoreDAO().getChores(this) {
+                chores.clear()
+                chores.addAll(it!!)
+                callback?.invoke(it)
+            }
+        } else {
+            callback?.invoke(chores)
         }
     }
 

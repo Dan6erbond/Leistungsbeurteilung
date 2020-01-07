@@ -29,7 +29,7 @@ data class Parent (
 
     fun fetchChildren(callback: ((ArrayList<Child>) -> Unit)? = null) {
         if (childrenL.isEmpty()) {
-            ChildDAO().getChildren(this) {
+            ChildDAO().getChildren(this.userId!!) {
                 childrenL.addAll(it!!)
                 callback?.invoke(childrenL)
             }
@@ -38,8 +38,8 @@ data class Parent (
         }
     }
 
-    fun fetchChores(force: Boolean = false, callback: ((ArrayList<Chore>) -> Unit)? = null) {
-        if (chores.isEmpty() || force) {
+    fun fetchChores(callback: ((ArrayList<Chore>) -> Unit)? = null) {
+        if (chores.isEmpty()) {
             ChoreDAO().getChores(this.userId!!) {
                 chores.clear()
                 chores.addAll(it!!)

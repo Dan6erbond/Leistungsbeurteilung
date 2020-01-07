@@ -14,6 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".parent.child.ChildDetailActivity" />
         <activity android:name=".parent.chore.ChoreDetailActivity" />
         <activity android:name=".child.ChildActivity" />
         <activity
@@ -24,11 +25,11 @@
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".parent.ParentActivity" />
-        <activity android:name=".barcode.BarcodeCaptureActivity" />
     </application>
 
 </manifest>

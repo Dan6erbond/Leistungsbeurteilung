@@ -37,14 +37,14 @@ class ChildDAO {
             }
     }
 
-    fun getChildren(parent: Parent, callback: ((ArrayList<Child>?) -> Unit)? = null) {
-        db.collection("users").document(parent.userId!!).collection("children")
+    fun getChildren(parentId: String, callback: ((ArrayList<Child>?) -> Unit)? = null) {
+        db.collection("users").document(parentId).collection("children")
             .get()
             .addOnSuccessListener {
                 val children = ArrayList<Child>()
                 for (document in it.documents) {
                     val child = document.toObject(Child::class.java)
-                    child!!.parent = parent
+                    child!!.parentId = parentId
                     children.add(child)
                 }
                 callback?.invoke(children)
