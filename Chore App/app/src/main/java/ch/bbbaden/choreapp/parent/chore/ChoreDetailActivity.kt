@@ -22,7 +22,7 @@ class ChoreDetailActivity : AppCompatActivity(),
     AddAssignmentDialogFragment.AddAssignmentDialogListener,
     ChoreAssignmentRecyclerAdapter.AssignmentHolder.AssignmentHolderListener {
 
-    private var chore: Chore? = null
+    private lateinit var chore: Chore
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: ChoreAssignmentRecyclerAdapter
@@ -35,7 +35,10 @@ class ChoreDetailActivity : AppCompatActivity(),
         linearLayoutManager = LinearLayoutManager(this)
         choreAssignments.layoutManager = linearLayoutManager
 
-        chore = intent.extras?.get("chore") as Chore?
+        val choreId = intent.extras?.get("choreId") as String
+        UserManager.parent!!.getChore(choreId) {
+            chore = it!!
+        }
 
         val transition: Transition = Slide(Gravity.BOTTOM)
         transition.duration = 600
@@ -48,23 +51,17 @@ class ChoreDetailActivity : AppCompatActivity(),
     }
 
     private fun setupUI() {
-        chore?.let {
-            choreName.text = it.name
-            choreDescription.text = it.description
+        choreName.text = chore.name
+        choreDescription.text = chore.description
 
-            adapter =
-                ChoreAssignmentRecyclerAdapter(
-                    it.assignments,
-                    this
-                )
-            adapter.notifyDataSetChanged()
+        adapter = ChoreAssignmentRecyclerAdapter(chore.assignments, this)
+        adapter.notifyDataSetChanged()
 
-            choreAssignments.adapter = adapter
+        choreAssignments.adapter = adapter
 
-            fabAddAssignment.setOnClickListener {
-                val dialog = AddAssignmentDialogFragment(this)
-                dialog.show(supportFragmentManager, "AddAssignmentDialogFragment")
-            }
+        fabAddAssignment.setOnClickListener {
+            val dialog = AddAssignmentDialogFragment(this)
+            dialog.show(supportFragmentManager, "AddAssignmentDialogFragment")
         }
     }
 
@@ -100,17 +97,16 @@ class ChoreDetailActivity : AppCompatActivity(),
     }
 
     private fun save(callback: ((success: Boolean) -> Unit)? = null) {
-        chore?.let {
-            slideSavingUp()
+        slideSaving(View.VISIBLE)
 
-            UserManager.parent?.saveChore(it) { success ->
-                callback?.invoke(success)
-            }
+        UserManager.parent?.saveChore(chore) { success ->
+            callback?.invoke(success)
+            slideSaving(View.GONE)
         }
     }
 
     private fun deleteChore(chore: Chore) {
-        slideSavingUp()
+        slideSaving(View.VISIBLE)
 
         UserManager.parent?.deleteChore(chore) {
             if (it) {
@@ -121,27 +117,27 @@ class ChoreDetailActivity : AppCompatActivity(),
         }
     }
 
-    private fun slideSavingUp() {
+    private fun slideSaving(visibility: Int) {
         val transition: Transition = Slide(Gravity.BOTTOM)
         transition.duration = 600
         transition.addTarget(R.id.savingCardView)
 
         TransitionManager.beginDelayedTransition(savingCardView.parent as ViewGroup, transition)
-        savingCardView.visibility = View.VISIBLE
+        savingCardView.visibility = visibility
     }
 
     override fun addAssignment(
         dialog: DialogFragment,
         assignment: Assignment
     ) {
-        chore!!.assignments.add(assignment)
+        chore.assignments.add(assignment)
         save {
             if (it) setupUI()
         }
     }
 
     override fun deleteAssignment(assignment: Assignment) {
-        chore!!.assignments.remove(assignment)
+        chore.assignments.remove(assignment)
         save {
             if (it) setupUI()
         }

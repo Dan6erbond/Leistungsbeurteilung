@@ -68,14 +68,13 @@ class ParentProfileFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
-        adapter =
-            ChildRecyclerAdapter(UserManager.parent!!.childrenL)
         parentImg.setImageBitmap(UserManager.parent?.getQRCode(smallerDimension))
         nameTxt.text = "${UserManager.parent?.first} ${UserManager.parent?.last ?: ""}"
         emailTxt.text = UserManager.parent?.email
         UserManager.parent?.fetchChildren {
+            adapter = ChildRecyclerAdapter(it)
             adapter.notifyDataSetChanged()
+            recyclerViewChildren.adapter = adapter
         }
-        recyclerViewChildren.adapter = adapter
     }
 }

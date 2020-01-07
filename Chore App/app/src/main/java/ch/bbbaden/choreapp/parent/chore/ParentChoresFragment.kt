@@ -67,14 +67,11 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     }
 
     private fun setupUI() {
-        adapter = ChoreRecyclerAdapter(
-            UserManager.parent!!.chores,
-            this
-        )
         UserManager.parent?.fetchChores {
+            adapter = ChoreRecyclerAdapter(it, this)
             adapter.notifyDataSetChanged()
+            recyclerViewChores.adapter = adapter
         }
-        recyclerViewChores.adapter = adapter
 
         fabAddChore.setOnClickListener {
             val dialog = AddChoreDialogFragment(this)
@@ -84,11 +81,8 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
 
     override fun openDetails(chore: Chore) {
         val intent = Intent(context, ChoreDetailActivity::class.java)
-        intent.putExtra("chore", chore)
-        startActivityForResult(
-            intent,
-            RC_CHORE_DETAILS
-        )
+        intent.putExtra("choreId", chore.id)
+        startActivityForResult(intent, RC_CHORE_DETAILS)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

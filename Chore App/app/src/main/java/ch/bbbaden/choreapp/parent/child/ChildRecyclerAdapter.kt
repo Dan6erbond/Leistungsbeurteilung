@@ -80,7 +80,7 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         }
 
         override fun onClick(v: View) {
-            Toast.makeText(itemView.context, "${child?.userId} clicked.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(itemView.context, "${child?.id} clicked.", Toast.LENGTH_SHORT).show()
         }
     }
 }

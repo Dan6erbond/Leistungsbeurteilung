@@ -1,14 +1,19 @@
 package ch.bbbaden.choreapp.models
 
 import android.util.Log
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ParentDAO {
 
     private val db = FirebaseFirestore.getInstance()
 
+    fun getDocumentReference(uid: String) : DocumentReference {
+        return db.collection("users").document(uid)
+    }
+
     fun getParent(parentId: String, callback: ((Parent?) -> Unit)? = null) {
-        db.collection("users").document(parentId)
+        getDocumentReference(parentId)
             .get()
             .addOnSuccessListener {
                 if (it.exists()) {
@@ -25,8 +30,8 @@ class ParentDAO {
     }
 
     fun addParent(parent: Parent, callback: ((success: Boolean) -> Unit)? = null) {
-        db.collection("users").document(parent.userId!!)
-            .set(parent) // use Collection.add() if document should have a generated id
+        parent.documentReference
+            .set(parent)
             .addOnSuccessListener {
                 callback?.invoke(true)
             }

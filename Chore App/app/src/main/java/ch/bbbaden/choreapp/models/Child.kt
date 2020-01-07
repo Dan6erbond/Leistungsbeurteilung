@@ -4,25 +4,29 @@ import android.graphics.Bitmap
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Exclude
 import com.google.zxing.WriterException
 
 data class Child(
-    @DocumentId val userId: String? = null,
+    @DocumentId val id: String? = null,
     val first: String? = null,
     val last: String? = null,
-    var parentId: String? = null,
-    val chores: ArrayList<Chore> = arrayListOf()
+    var parent: DocumentReference? = null
 ) {
 
-    var parent: Parent? = null
-        set(value) {
-            field = value
-            parentId = value?.userId
+    @get:Exclude
+    val chores: ArrayList<Chore> = arrayListOf()
+
+    @get:Exclude
+    val documentReference: DocumentReference
+        get() {
+            return ChildDAO().getDocumentReference(id!!)
         }
 
-
+    @Exclude
     fun getQRCode(smallerDimension: Int): Bitmap {
-        val content = "childuid:$userId"
+        val content = "childuid:$id"
         val qrgEncoder = QRGEncoder(content, null, QRGContents.Type.TEXT, smallerDimension)
 
         try {
@@ -45,7 +49,7 @@ data class Child(
     }
 
     fun fetchParent(callback: ((Parent?) -> Unit)? = null) {
-        ParentDAO().getParent(parentId!!, callback)
+        ParentDAO().getParent(parent!!.id, callback)
     }
 
 }

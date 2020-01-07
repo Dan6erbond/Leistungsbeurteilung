@@ -76,7 +76,7 @@ class ChoreAssignmentRecyclerAdapter(
         @SuppressLint("SetTextI18n")
         fun bindItem(assignment: Assignment) {
             this.assignment = assignment
-            view.startDate.setText(assignment.getDisplayTime(assignment.startDate))
+            view.startDate.setText(assignment.getDisplayTime(assignment.startDate!!))
 
             view.choreAssignmentTitleButton.setOnClickListener {
                 toggleDetails()
@@ -95,23 +95,21 @@ class ChoreAssignmentRecyclerAdapter(
                 true
             }
 
-            val childArrayAdapter =
-                ChildArrayAdapter(
-                    view.context,
-                    UserManager.parent!!.childrenL
-                )
-            view.childSpinner.adapter = childArrayAdapter
+            UserManager.parent!!.fetchChildren { children ->
+                val childArrayAdapter = ChildArrayAdapter(view.context, children)
+                view.childSpinner.adapter = childArrayAdapter
 
-            var childIndex = 0
-            for (i in UserManager.parent!!.childrenL.indices) {
-                if (UserManager.parent!!.childrenL[i].userId == assignment.assignedTo) {
-                    childIndex = i
-                    break
+                var childIndex = 0
+                for (i in children.indices) {
+                    if (children[i].id == assignment.assignedTo?.id) {
+                        childIndex = i
+                        break
+                    }
                 }
-            }
 
-            view.childName.text = UserManager.parent!!.childrenL[childIndex].first
-            view.childSpinner.setSelection(childIndex)
+                view.childName.text = children[childIndex].first
+                view.childSpinner.setSelection(childIndex)
+            }
 
             view.childSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -125,7 +123,7 @@ class ChoreAssignmentRecyclerAdapter(
                     id: Long
                 ) {
                     val child = parent!!.getItemAtPosition(position) as Child
-                    assignment.assignedTo = child.userId
+                    assignment.assignedTo = child.documentReference
                     view.childName.text = child.first
                 }
 

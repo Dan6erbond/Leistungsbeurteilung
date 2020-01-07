@@ -2,36 +2,21 @@ package ch.bbbaden.choreapp.models
 
 import android.text.format.DateUtils
 import com.google.firebase.Timestamp
-import java.io.Serializable
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Exclude
 import java.text.SimpleDateFormat
 import java.util.*
 
 data class Assignment(
-    var assignedTo: String? = null,
-    val repeat: Repeat? = null
-) : Serializable {
+    var assignedTo: DocumentReference? = null,
+    val repeat: Repeat? = null,
+    val startDate: Timestamp? = null
+) {
 
-    lateinit var startDate: Date
-
-    constructor(
-        assignedTo: String? = null,
-        repeat: Repeat? = null,
-        startDate: Timestamp? = null
-    ) : this(assignedTo, repeat) {
-        this.startDate = startDate!!.toDate()
-    }
-
-    constructor(
-        assignedTo: String? = null,
-        repeat: Repeat? = null,
-        startDate: Date? = null
-    ) : this(assignedTo, repeat) {
-        this.startDate = startDate!!
-    }
-
+    @Exclude
     fun getNextDate(): Date? {
         val currentDate = Calendar.getInstance().time
-        val nextDate = startDate
+        val nextDate = startDate!!.toDate()
         val repeat = repeat
 
         when {
@@ -54,11 +39,13 @@ data class Assignment(
         }
     }
 
-    fun getDisplayTime(date: Date): String {
+    @Exclude
+    fun getDisplayTime(timestamp: Timestamp): String {
+        val date = timestamp.toDate()
         val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
         val timeFormat = SimpleDateFormat.getTimeInstance()
         return if (DateUtils.isToday(date.time))
-            timeFormat.format(date) else dateTimeFormat.format(date)
+            "Today @ ${timeFormat.format(date)}" else dateTimeFormat.format(date)
     }
 
     private fun addToDate(date: Date, afterDate: Date, unit: Int, value: Int): Date {
@@ -68,14 +55,6 @@ data class Assignment(
             calendar.add(unit, value)
         }
         return calendar.time
-    }
-
-    fun getData(): HashMap<String, *> {
-        return hashMapOf(
-            "assignedTo" to assignedTo,
-            "repeat" to repeat,
-            "startDate" to Timestamp(startDate)
-        )
     }
 
     override fun equals(other: Any?): Boolean {

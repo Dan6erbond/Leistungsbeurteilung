@@ -4,20 +4,29 @@ import android.graphics.Bitmap
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Exclude
 import com.google.zxing.WriterException
 
-data class Parent (
-    @DocumentId val userId: String? = null,
+data class Parent(
+    @DocumentId val id: String? = null,
     val email: String? = null,
     val first: String? = null,
-    val last: String? = null,
-    val children: List<String> = arrayListOf(),
-    val childrenL: ArrayList<Child> = arrayListOf(),
-    val chores: ArrayList<Chore> = arrayListOf()
+    val last: String? = null
 ) {
 
+    private val children: ArrayList<Child> = arrayListOf()
+    private val chores: ArrayList<Chore> = arrayListOf()
+
+    @get:Exclude
+    val documentReference: DocumentReference
+        get() {
+            return ParentDAO().getDocumentReference(id!!)
+        }
+
+    @Exclude
     fun getQRCode(smallerDimension: Int): Bitmap {
-        val content = "parentuid:$userId"
+        val content = "parentuid:$id"
         val qrgEncoder = QRGEncoder(content, null, QRGContents.Type.TEXT, smallerDimension)
 
         try {
@@ -28,19 +37,19 @@ data class Parent (
     }
 
     fun fetchChildren(callback: ((ArrayList<Child>) -> Unit)? = null) {
-        if (childrenL.isEmpty()) {
-            ChildDAO().getChildren(this.userId!!) {
-                childrenL.addAll(it!!)
-                callback?.invoke(childrenL)
+        if (children.isEmpty()) {
+            ChildDAO().getChildren(this) {
+                children.addAll(it!!)
+                callback?.invoke(children)
             }
         } else {
-            callback?.invoke(childrenL)
+            callback?.invoke(children)
         }
     }
 
     fun fetchChores(callback: ((ArrayList<Chore>) -> Unit)? = null) {
         if (chores.isEmpty()) {
-            ChoreDAO().getChores(this.userId!!) {
+            ChoreDAO().getChores(this.id!!) {
                 chores.clear()
                 chores.addAll(it!!)
                 callback?.invoke(chores)
@@ -51,7 +60,7 @@ data class Parent (
     }
 
     fun saveChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
-        ChoreDAO().saveChore(this, chore) {
+        ChoreDAO().saveChore(chore) {
             if (it) {
                 chores.remove(chore)
                 chores.add(chore)
@@ -61,16 +70,31 @@ data class Parent (
     }
 
     fun addChore(chore: Chore, callback: ((chore: Chore?) -> Unit)? = null) {
-        ChoreDAO().addChore(this, chore) {
+        chore.parent = documentReference
+        ChoreDAO().addChore(chore) {
             if (it != null) chores.add(it)
             callback?.invoke(it)
         }
     }
 
     fun deleteChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
-        ChoreDAO().deleteChore(this, chore) {
+        ChoreDAO().deleteChore(chore) {
             if (it) chores.remove(chore)
             callback?.invoke(it)
+        }
+    }
+
+    @Exclude
+    fun getChore(choreId: String, callback: ((chore: Chore?) -> Unit)? = null) {
+        fetchChores {
+            var found = false
+            for (chore in it) {
+                if (chore.id == choreId){
+                    found = true
+                    callback?.invoke(chore)
+                }
+            }
+            if (!found) callback?.invoke(null)
         }
     }
 }

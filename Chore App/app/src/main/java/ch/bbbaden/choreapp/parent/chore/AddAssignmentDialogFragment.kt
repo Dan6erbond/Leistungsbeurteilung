@@ -11,6 +11,7 @@ import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.models.Repeat
 import ch.bbbaden.choreapp.parent.child.ChildArrayAdapter
+import com.google.firebase.Timestamp
 import kotlinx.android.synthetic.main.dialog_fragment_add_assignment.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,12 +33,10 @@ class AddAssignmentDialogFragment(private val listener: AddAssignmentDialogListe
 
             val view = inflater.inflate(R.layout.dialog_fragment_add_assignment, null)
 
-            val childArrayAdapter =
-                ChildArrayAdapter(
-                    view.context,
-                    UserManager.parent!!.childrenL
-                )
-            view.childSpinner.adapter = childArrayAdapter
+            UserManager.parent!!.fetchChildren { children ->
+                val childArrayAdapter = ChildArrayAdapter(view.context, children)
+                view.childSpinner.adapter = childArrayAdapter
+            }
 
             val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
             view.startDate.setText(dateTimeFormat.format(Calendar.getInstance().time))
@@ -61,12 +60,12 @@ class AddAssignmentDialogFragment(private val listener: AddAssignmentDialogListe
                     listener.addAssignment(
                         this,
                         Assignment(
-                            (view.childSpinner.selectedItem as Child).userId,
+                            (view.childSpinner.selectedItem as Child).documentReference,
                             Repeat(
                                 view.repeatUnit.selectedItem as String,
                                 view.repeatValue.text.toString().toInt()
                             ),
-                            startDate
+                            Timestamp(startDate)
                         )
                     )
                 }

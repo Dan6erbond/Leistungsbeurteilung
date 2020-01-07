@@ -1,19 +1,24 @@
 package ch.bbbaden.choreapp.models
 
 import android.util.Log
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ChoreDAO {
 
     private val db = FirebaseFirestore.getInstance()
 
+    fun getDocumentReference(choreId: String): DocumentReference {
+        return db.collection("chores").document(choreId)
+    }
+
     fun getChores(child: Child, callback: ((ArrayList<Chore>?) -> Unit)? = null) {
-        getChores(child.parentId!!) {
+        getChores(child.parent?.id!!) {
             if (it != null) {
                 val chores = ArrayList<Chore>()
                 for (chore in it) {
                     for (assignment in chore.assignments) {
-                        val assignedTo = assignment.assignedTo == child.userId
+                        val assignedTo = assignment.assignedTo?.id == child.id
                         val nextAssignmentExists = assignment.getNextDate() != null
                         if (assignedTo && nextAssignmentExists) {
                             chore.child = child
@@ -30,7 +35,7 @@ class ChoreDAO {
     }
 
     fun getChores(userId: String, callback: ((ArrayList<Chore>?) -> Unit)? = null) {
-        db.collection("users").document(userId).collection("chores")
+        db.collection("chores").whereEqualTo("parent", ParentDAO().getDocumentReference(userId))
             .get()
             .addOnSuccessListener {
                 val chores = ArrayList<Chore>()
@@ -46,9 +51,9 @@ class ChoreDAO {
             }
     }
 
-    fun saveChore(parent: Parent, chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
-        db.collection("users").document(parent.userId!!).collection("chores").document(chore.id!!)
-            .set(chore.getData())
+    fun saveChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
+        getDocumentReference(chore.id!!)
+            .set(chore)
             .addOnSuccessListener {
                 callback?.invoke(true)
             }
@@ -58,9 +63,9 @@ class ChoreDAO {
             }
     }
 
-    fun addChore(parent: Parent, chore: Chore, callback: ((chore: Chore?) -> Unit)? = null) {
-        db.collection("users").document(parent.userId!!).collection("chores")
-            .add(chore.getData())
+    fun addChore(chore: Chore, callback: ((chore: Chore?) -> Unit)? = null) {
+        db.collection("chores")
+            .add(chore)
             .addOnSuccessListener {
                 chore.id = it.id
                 callback?.invoke(chore)
@@ -71,8 +76,8 @@ class ChoreDAO {
             }
     }
 
-    fun deleteChore(parent: Parent, chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
-        db.collection("users").document(parent.userId!!).collection("chores").document(chore.id!!)
+    fun deleteChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
+        getDocumentReference(chore.id!!)
             .delete()
             .addOnSuccessListener {
                 callback?.invoke(true)
