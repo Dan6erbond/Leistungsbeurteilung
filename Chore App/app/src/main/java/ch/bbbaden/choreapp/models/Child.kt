@@ -9,9 +9,9 @@ import com.google.firebase.firestore.Exclude
 import com.google.zxing.WriterException
 
 data class Child(
-    @DocumentId val id: String? = null,
-    val first: String? = null,
-    val last: String? = null,
+    @DocumentId var id: String? = null,
+    var first: String? = null,
+    var last: String? = null,
     var parent: DocumentReference? = null,
     var completedChores: ArrayList<CompletedChore> = arrayListOf()
 ) {

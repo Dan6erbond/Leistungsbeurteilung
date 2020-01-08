@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
+import ch.bbbaden.choreapp.dialogs.NameDialogFragment
 import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.models.Parent
 import ch.bbbaden.choreapp.parent.child.ChildDetailActivity
@@ -21,7 +23,8 @@ import kotlinx.android.synthetic.main.fragment_parent_profile.*
 
 const val RC_CHILD_DETAILS = 0
 
-class ParentProfileFragment : Fragment(), ChildRecyclerAdapter.ChildHolder.ChildHolderListener {
+class ParentProfileFragment : Fragment(), ChildRecyclerAdapter.ChildHolder.ChildHolderListener,
+    NameDialogFragment.NameDialogListener {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,6 +70,10 @@ class ParentProfileFragment : Fragment(), ChildRecyclerAdapter.ChildHolder.Child
             adapter.notifyDataSetChanged()
             recyclerViewChildren.adapter = adapter
         }
+        fabAddChild.setOnClickListener {
+            val dialog = NameDialogFragment(this, resources.getString(R.string.add_child), resources.getString(R.string.add))
+            dialog.show(fragmentManager!!, "NameDialogFragment")
+        }
     }
 
     override fun openDetails(child: Child) {
@@ -81,5 +88,11 @@ class ParentProfileFragment : Fragment(), ChildRecyclerAdapter.ChildHolder.Child
         }
 
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun setName(dialog: DialogFragment, first: String, last: String?) {
+        UserManager.parent!!.addChild(Child(first = first, last = last)) {
+            if (it != null) setupUI()
+        }
     }
 }

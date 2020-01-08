@@ -11,8 +11,8 @@ import java.util.*
 
 class Chore(
     @DocumentId var id: String? = null,
-    val name: String? = null,
-    val description: String? = null,
+    var name: String? = null,
+    var description: String? = null,
     val assignments: ArrayList<Assignment> = arrayListOf(),
     var parent: DocumentReference? = null
 ) {

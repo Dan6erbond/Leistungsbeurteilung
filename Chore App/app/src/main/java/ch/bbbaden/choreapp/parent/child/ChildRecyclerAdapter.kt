@@ -48,7 +48,7 @@ class ChildRecyclerAdapter(private val children: List<Child>, private val listen
         @SuppressLint("SetTextI18n")
         fun bindChore(child: Child) {
             this.child = child
-            view.childName.text = child.first
+            view.childName.text = "${child.first} ${child.last ?: ""}"
 
             val qrCode = child.getQRCode(smallerDimension)
             view.qrCode.setImageBitmap(qrCode)

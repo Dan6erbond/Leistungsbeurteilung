@@ -2,8 +2,12 @@ package ch.bbbaden.choreapp.parent.child
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -13,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.dialogs.ConfirmationDialogFragment
+import ch.bbbaden.choreapp.dialogs.NameDialogFragment
 import ch.bbbaden.choreapp.dialogs.ScanQRDialogFragment
 import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.models.ChoreDAO
@@ -25,10 +30,12 @@ import kotlinx.android.synthetic.main.activity_chore_detail.toolbar
 private const val REQUEST_CODE_PERMISSIONS = 10
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-class ChildDetailActivity : AppCompatActivity(), ScanQRDialogFragment.ScanQRDialogListener {
+class ChildDetailActivity : AppCompatActivity(), ScanQRDialogFragment.ScanQRDialogListener,
+    NameDialogFragment.NameDialogListener {
 
     private lateinit var child: Child
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var adapter: CompletedChoreRecyclerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,10 +52,49 @@ class ChildDetailActivity : AppCompatActivity(), ScanQRDialogFragment.ScanQRDial
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.chore_detail_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_save -> {
+            save {
+                finish()
+            }
+            true
+        }
+
+        R.id.action_delete -> {
+            val dialog = ConfirmationDialogFragment(getString(R.string.remove_child_confirmation))
+                .setPositiveButtonListener {
+                    deleteChild()
+                }
+            dialog.show(supportFragmentManager, "ConfirmationDialogFragment")
+            true
+        }
+
+        else -> {
+            super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun deleteChild() {
+        UserManager.parent!!.deleteChild(child) {
+            if (it) {
+                setResult(Activity.RESULT_OK)
+                finish()
+            } else {
+                TODO("Show error")
+            }
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
         childImg.setImageBitmap(child.getQRCode(smallerDimension))
         nameTxt.text = "${child.first} ${child.last ?: ""}"
+
         fabScanQR.setOnClickListener {
             if (allPermissionsGranted()) {
                 val dialog =
@@ -66,8 +112,18 @@ class ChildDetailActivity : AppCompatActivity(), ScanQRDialogFragment.ScanQRDial
             }
         }
 
-        val adapter = CompletedChoreRecyclerAdapter(child.completedChores)
+        adapter = CompletedChoreRecyclerAdapter(child.completedChores)
         completedChores.adapter = adapter
+
+        val onClickListener = View.OnClickListener {
+            val dialog = NameDialogFragment(
+                this,
+                resources.getString(R.string.change_name)
+            )
+            dialog.show(supportFragmentManager, "NameDialogFragment")
+        }
+        editName.setOnClickListener(onClickListener)
+        nameTxt.setOnClickListener(onClickListener)
     }
 
     override fun onRequestPermissionsResult(
@@ -94,9 +150,10 @@ class ChildDetailActivity : AppCompatActivity(), ScanQRDialogFragment.ScanQRDial
             ChoreDAO().getChore(mr.groupValues[1]) { chore ->
                 if (chore != null && chore.parent?.id == UserManager.parent!!.id) {
                     val completedChore = CompletedChore(chore.documentReference, Timestamp.now())
-                    val d = ConfirmationDialogFragment("Has your child really completed the chore \"${chore.name}\"?").setPositiveButtonListener {
-                        completeChore(completedChore)
-                    }
+                    val d =
+                        ConfirmationDialogFragment("Has your child really completed the chore \"${chore.name}\"?").setPositiveButtonListener {
+                            completeChore(completedChore)
+                        }
                     d.show(supportFragmentManager, "ConfirmationDialogFragment")
                 } else {
                     Toast.makeText(this, "Chore scanned does not exist.", Toast.LENGTH_LONG)
@@ -106,15 +163,28 @@ class ChildDetailActivity : AppCompatActivity(), ScanQRDialogFragment.ScanQRDial
         }
     }
 
-    private fun completeChore(completedChore: CompletedChore) {
-        child.completedChores.add(completedChore)
+    private fun save(callback: ((success: Boolean) -> Unit)? = null) {
+        // TODO: Saving toast/card animation
         UserManager.parent!!.saveChild(child) {
             if (it) {
-                Toast.makeText(this, "Completed chore added.", Toast.LENGTH_LONG).show()
-                setupUI()
-            } else {
-                TODO("Show error")
+                setResult(Activity.RESULT_OK)
             }
+            callback?.invoke(it)
+        }
+    }
+
+    private fun completeChore(completedChore: CompletedChore) {
+        child.completedChores.add(completedChore)
+        save {
+            if (it) adapter.notifyDataSetChanged()
+        }
+    }
+
+    override fun setName(dialog: DialogFragment, first: String, last: String?) {
+        child.first = first
+        child.last = last
+        save {
+            if (it) setupUI()
         }
     }
 }

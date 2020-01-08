@@ -1,35 +1,33 @@
-package ch.bbbaden.choreapp.parent.child
+package ch.bbbaden.choreapp.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import ch.bbbaden.choreapp.R
-import ch.bbbaden.choreapp.models.Child
-import kotlinx.android.synthetic.main.dialog_fragment_add_child.view.*
+import kotlinx.android.synthetic.main.dialog_fragment_name.view.*
 
-class AddChildDialogFragment(private val listener: AddChildDialogListener) : DialogFragment() {
+class NameDialogFragment(
+    private val listener: NameDialogListener,
+    private val title: String,
+    private val positiveButtonText: String? = null
+) : DialogFragment() {
 
-    interface AddChildDialogListener {
-        fun addChild(dialog: DialogFragment, child: Child)
+    interface NameDialogListener {
+        fun setName(dialog: DialogFragment, first: String, last: String?)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
             val inflater = requireActivity().layoutInflater
-            val view = inflater.inflate(R.layout.dialog_fragment_add_chore, null)
+            val view = inflater.inflate(R.layout.dialog_fragment_name, null)
+            view.title.text = title
             builder.setView(view)
                 .setPositiveButton(
-                    R.string.add
+                    positiveButtonText ?: resources.getString(R.string.done)
                 ) { _, _ ->
-                    listener.addChild(
-                        this,
-                        Child(
-                            first = view.childDialogFirst.text.toString(),
-                            last = view.childDialogLast.text.toString()
-                        )
-                    )
+                    listener.setName(this, view.first.text.toString().trim(), view.last.text.toString().trim())
                 }
                 .setNegativeButton(
                     R.string.fui_cancel

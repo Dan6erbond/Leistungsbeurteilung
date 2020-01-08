@@ -45,17 +45,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/childImg" />
+
+        <Button
+            android:id="@+id/editName"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/ic_edit"
+            app:layout_constraintStart_toEndOf="@id/nameTxt"
+            app:layout_constraintTop_toTopOf="@id/nameTxt" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:layout_margin="8dp"
+        android:text="@string/completed_chores"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/childProfileView"
-        android:text="@string/completed_chores"/>
+        app:layout_constraintTop_toBottomOf="@id/childProfileView" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/completedChores"
@@ -63,10 +72,10 @@
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/fabScanQR"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        app:layout_constraintBottom_toTopOf="@id/fabScanQR" />
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabScanQR"

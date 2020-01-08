@@ -1,7 +1,6 @@
 package ch.bbbaden.choreapp.parent.chore
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +12,7 @@ import androidx.transition.TransitionManager
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.dialogs.ConfirmationDialogFragment
+import ch.bbbaden.choreapp.dialogs.InputDialogFragment
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Chore
 import kotlinx.android.synthetic.main.activity_chore_detail.*
@@ -20,7 +20,8 @@ import kotlinx.android.synthetic.main.activity_chore_detail.*
 
 class ChoreDetailActivity : AppCompatActivity(),
     AddAssignmentDialogFragment.AddAssignmentDialogListener,
-    ChoreAssignmentRecyclerAdapter.AssignmentHolder.AssignmentHolderListener {
+    ChoreAssignmentRecyclerAdapter.AssignmentHolder.AssignmentHolderListener,
+    InputDialogFragment.EditNameDialogListener {
 
     private lateinit var chore: Chore
 
@@ -55,13 +56,30 @@ class ChoreDetailActivity : AppCompatActivity(),
         choreDescription.text = chore.description
 
         adapter = ChoreAssignmentRecyclerAdapter(chore.assignments, this)
-        adapter.notifyDataSetChanged()
 
         choreAssignments.adapter = adapter
 
         fabAddAssignment.setOnClickListener {
             val dialog = AddAssignmentDialogFragment(this)
             dialog.show(supportFragmentManager, "AddAssignmentDialogFragment")
+        }
+
+        editName.setOnClickListener {
+            val dialog = InputDialogFragment(
+                this,
+                resources.getString(R.string.change_name),
+                resources.getString(R.string.chore_name)
+            )
+            dialog.show(supportFragmentManager, "EditChoreNameDialogFragment")
+        }
+
+        editDescription.setOnClickListener {
+            val dialog = InputDialogFragment(
+                this,
+                resources.getString(R.string.change_description),
+                resources.getString(R.string.chore_description)
+            )
+            dialog.show(supportFragmentManager, "EditChoreDescriptionDialogFragment")
         }
     }
 
@@ -73,10 +91,6 @@ class ChoreDetailActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_save -> {
             save {
-                if (it) {
-                    val intent = Intent()
-                    setResult(Activity.RESULT_OK, intent)
-                }
                 finish()
             }
             true
@@ -85,7 +99,7 @@ class ChoreDetailActivity : AppCompatActivity(),
         R.id.action_delete -> {
             val dialog = ConfirmationDialogFragment(getString(R.string.remove_chore_confirmation))
                 .setPositiveButtonListener {
-                    deleteChore(chore!!)
+                    deleteChore()
                 }
             dialog.show(supportFragmentManager, "ConfirmationDialogFragment")
             true
@@ -100,18 +114,20 @@ class ChoreDetailActivity : AppCompatActivity(),
         slideSaving(View.VISIBLE)
 
         UserManager.parent?.saveChore(chore) { success ->
+            if (success) {
+                setResult(Activity.RESULT_OK)
+            }
             callback?.invoke(success)
             slideSaving(View.GONE)
         }
     }
 
-    private fun deleteChore(chore: Chore) {
+    private fun deleteChore() {
         slideSaving(View.VISIBLE)
 
         UserManager.parent?.deleteChore(chore) {
             if (it) {
-                val intent = Intent()
-                setResult(Activity.RESULT_OK, intent)
+                setResult(Activity.RESULT_OK)
                 finish()
             }
         }
@@ -132,14 +148,31 @@ class ChoreDetailActivity : AppCompatActivity(),
     ) {
         chore.assignments.add(assignment)
         save {
-            if (it) setupUI()
+            if (it) adapter.notifyDataSetChanged()
         }
     }
 
     override fun deleteAssignment(assignment: Assignment) {
         chore.assignments.remove(assignment)
         save {
-            if (it) setupUI()
+            if (it) adapter.notifyDataSetChanged()
+        }
+    }
+
+    override fun setInput(dialog: DialogFragment, input: String) {
+        when (dialog.tag) {
+            "EditChoreNameDialogFragment" -> {
+                chore.name = input
+                save {
+                    if (it) choreName.text = chore.name
+                }
+            }
+            "EditChoreDescriptionDialogFragment" -> {
+                chore.description = input
+                save {
+                    if (it) choreDescription.text = chore.description
+                }
+            }
         }
     }
 

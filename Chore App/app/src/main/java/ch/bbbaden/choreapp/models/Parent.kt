@@ -69,6 +69,21 @@ data class Parent(
         }
     }
 
+    fun addChild(child: Child, callback: ((child: Child?) -> Unit)? = null) {
+        child.parent = documentReference
+        ChildDAO().addChild(child) {
+            if (it != null) children.add(it)
+            callback?.invoke(it)
+        }
+    }
+
+    fun deleteChild(child: Child, callback: ((success: Boolean) -> Unit)? = null) {
+        ChildDAO().deleteChild(child) {
+            if (it) children.remove(child)
+            callback?.invoke(it)
+        }
+    }
+
     fun saveChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
         ChoreDAO().saveChore(chore) {
             if (it) {

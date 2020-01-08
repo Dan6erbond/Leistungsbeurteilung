@@ -37,6 +37,16 @@
             <requestFocus />
         </TextView>
 
+        <Button
+            android:id="@+id/editName"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/ic_edit"
+            app:layout_constraintStart_toEndOf="@id/choreName"
+            app:layout_constraintTop_toTopOf="@id/choreName" />
+
         <TextView
             android:id="@+id/choreDescription"
             android:layout_width="wrap_content"
@@ -46,6 +56,15 @@
             android:text="Chore Description"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/choreName" />
+
+        <Button
+            android:id="@+id/editDescription"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/ic_edit"
+            app:layout_constraintStart_toEndOf="@id/choreDescription"
+            app:layout_constraintTop_toTopOf="@id/choreDescription" />
 
         <TextView
             android:id="@+id/choreAssignmentsTitle"

@@ -53,4 +53,28 @@ class ChildDAO {
                 Log.e(this::class.simpleName, it.message ?: it.toString())
             }
     }
+
+    fun addChild(child: Child, callback: ((child: Child?) -> Unit)? = null) {
+        db.collection("children").add(child)
+            .addOnSuccessListener {
+                child.id = it.id
+                callback?.invoke(child)
+            }
+            .addOnFailureListener {
+                callback?.invoke(null)
+                Log.e(this::class.simpleName, it.message ?: it.toString())
+            }
+    }
+
+    fun deleteChild(child: Child, callback: ((success: Boolean) -> Unit)? = null) {
+        child.documentReference
+            .delete()
+            .addOnSuccessListener {
+                callback?.invoke(true)
+            }
+            .addOnFailureListener {
+                callback?.invoke(false)
+                Log.e(this::class.simpleName, it.message ?: it.toString())
+            }
+    }
 }
