@@ -45,17 +45,26 @@ class Chore(
         return null
     }
 
-    override fun equals(other: Any?): Boolean =
-        if (other is Chore) other.id == id
-        else false
-
-    override fun hashCode(): Int = Objects.hash(id, name, description)
-
     fun addAssignment(assignment: Assignment, callback: ((success: Boolean) -> Unit)? = null) {
         assignments.add(assignment)
         ChoreDAO().saveChore(this) {
             callback?.invoke(it)
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Chore
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
     }
 
 }

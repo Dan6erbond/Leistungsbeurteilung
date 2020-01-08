@@ -41,4 +41,16 @@ class ChildDAO {
                 Log.e(this::class.simpleName, it.message ?: it.toString())
             }
     }
+
+    fun saveChild(child: Child, callback: ((success: Boolean) -> Unit)? = null) {
+        child.documentReference
+            .set(child)
+            .addOnSuccessListener {
+                callback?.invoke(true)
+            }
+            .addOnFailureListener {
+                callback?.invoke(false)
+                Log.e(this::class.simpleName, it.message ?: it.toString())
+            }
+    }
 }

@@ -5,7 +5,7 @@
         android:title="@string/login" />
     <item
         android:id="@+id/QRFragment"
-        android:icon="@drawable/ic_menu_camera"
+        android:icon="@drawable/ic_camera"
         android:title="@string/qr_code" />
     <item
         android:id="@+id/signUpFragment"

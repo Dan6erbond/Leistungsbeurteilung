@@ -21,12 +21,10 @@ import ch.bbbaden.choreapp.models.Parent
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_parent_chores.*
 
+const val RC_CHORE_DETAILS = 0
+
 class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogListener,
     ChoreRecyclerAdapter.ChoreHolder.ChoreHolderListener {
-
-    companion object {
-        const val RC_CHORE_DETAILS = 0
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

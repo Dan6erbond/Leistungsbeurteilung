@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
 import ch.bbbaden.choreapp.dialogs.ConfirmationDialogFragment
+import ch.bbbaden.choreapp.displayTime
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Child
@@ -76,7 +77,7 @@ class ChoreAssignmentRecyclerAdapter(
         @SuppressLint("SetTextI18n")
         fun bindItem(assignment: Assignment) {
             this.assignment = assignment
-            view.startDate.setText(assignment.getDisplayTime(assignment.startDate!!))
+            view.startDate.setText(assignment.startDate!!.displayTime)
 
             view.choreAssignmentTitleButton.setOnClickListener {
                 toggleDetails()

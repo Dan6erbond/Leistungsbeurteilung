@@ -49,7 +49,6 @@ class ChoreRecyclerAdapter(
         @SuppressLint("SetTextI18n")
         fun bindChore(chore: Chore) {
             this.chore = chore
-            // view.choreImage.setImageResource(R.drawable.ic_menu_camera)
             v.choreName.text = chore.name
             v.choreDescription.text = chore.description
         }

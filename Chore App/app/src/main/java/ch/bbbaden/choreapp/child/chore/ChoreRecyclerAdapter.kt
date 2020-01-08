@@ -1,20 +1,14 @@
 package ch.bbbaden.choreapp.child.chore
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Point
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import ch.bbbaden.choreapp.R
-import ch.bbbaden.choreapp.UserManager
+import ch.bbbaden.choreapp.*
 import ch.bbbaden.choreapp.dialogs.QRDialogFragment
-import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Chore
-import com.google.firebase.Timestamp
 import kotlinx.android.synthetic.main.card_view_child_chore.view.*
 
 class ChoreRecyclerAdapter(private val chores: List<Chore>) :
@@ -42,19 +36,6 @@ class ChoreRecyclerAdapter(private val chores: List<Chore>) :
 
         private var chore: Chore? = null
 
-        private val smallerDimension: Int
-            get() {
-                val manager = view.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-                val display = manager.defaultDisplay
-                val point = Point()
-                display.getSize(point)
-                val width = point.x
-                val height = point.y
-                Pair(width, height)
-                val smallerDimension = if (width < height) width else height
-                return smallerDimension * 3 / 4
-            }
-
         init {
             view.setOnClickListener(this)
         }
@@ -62,11 +43,10 @@ class ChoreRecyclerAdapter(private val chores: List<Chore>) :
         @SuppressLint("SetTextI18n")
         fun bindChore(chore: Chore) {
             this.chore = chore
-            // view.choreImage.setImageResource(R.drawable.ic_menu_camera)
             view.choreName.text = chore.name
 
             val assignment = chore.getAssignment(UserManager.child!!)
-            view.choreTime.text = assignment?.getDisplayTime(Timestamp(assignment.getNextDate()!!))
+            view.choreTime.text = assignment?.getNextDate()!!.displayTime
 
             view.choreDescription.text = chore.description
 

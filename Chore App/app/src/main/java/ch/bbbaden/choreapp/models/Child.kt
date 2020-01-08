@@ -12,7 +12,8 @@ data class Child(
     @DocumentId val id: String? = null,
     val first: String? = null,
     val last: String? = null,
-    var parent: DocumentReference? = null
+    var parent: DocumentReference? = null,
+    var completedChores: ArrayList<CompletedChore> = arrayListOf()
 ) {
 
     @get:Exclude
@@ -46,6 +47,21 @@ data class Child(
 
     fun fetchParent(callback: ((Parent?) -> Unit)? = null) {
         ParentDAO().getParent(parent!!.id, callback)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Child
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
     }
 
 }

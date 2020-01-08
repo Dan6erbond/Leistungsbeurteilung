@@ -1,23 +1,27 @@
 package ch.bbbaden.choreapp.parent
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Point
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.UserManager
+import ch.bbbaden.choreapp.models.Child
 import ch.bbbaden.choreapp.models.Parent
+import ch.bbbaden.choreapp.parent.child.ChildDetailActivity
 import ch.bbbaden.choreapp.parent.child.ChildRecyclerAdapter
+import ch.bbbaden.choreapp.smallerDimension
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_parent_profile.*
 
-class ParentProfileFragment : Fragment() {
+const val RC_CHILD_DETAILS = 0
+
+class ParentProfileFragment : Fragment(), ChildRecyclerAdapter.ChildHolder.ChildHolderListener {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,19 +32,6 @@ class ParentProfileFragment : Fragment() {
     }
 
     private lateinit var auth: FirebaseAuth
-
-    private val smallerDimension: Int
-        get() {
-            val manager = activity?.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val display = manager.defaultDisplay
-            val point = Point()
-            display.getSize(point)
-            val width = point.x
-            val height = point.y
-            Pair(width, height)
-            val smallerDimension = if (width < height) width else height
-            return smallerDimension * 3 / 4
-        }
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: ChildRecyclerAdapter
@@ -72,9 +63,23 @@ class ParentProfileFragment : Fragment() {
         nameTxt.text = "${UserManager.parent?.first} ${UserManager.parent?.last ?: ""}"
         emailTxt.text = UserManager.parent?.email
         UserManager.parent?.fetchChildren {
-            adapter = ChildRecyclerAdapter(it)
+            adapter = ChildRecyclerAdapter(it, this)
             adapter.notifyDataSetChanged()
             recyclerViewChildren.adapter = adapter
         }
+    }
+
+    override fun openDetails(child: Child) {
+        val intent = Intent(context, ChildDetailActivity::class.java)
+        intent.putExtra("childId", child.id)
+        startActivityForResult(intent, RC_CHILD_DETAILS)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == RC_CHILD_DETAILS) {
+            if (resultCode == Activity.RESULT_OK) setupUI()
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

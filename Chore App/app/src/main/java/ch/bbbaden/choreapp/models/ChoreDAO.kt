@@ -33,6 +33,19 @@ class ChoreDAO {
         }
     }
 
+    fun getChore(choreId: String, callback: ((chore: Chore?) -> Unit)? = null) {
+        getDocumentReference(choreId)
+            .get()
+            .addOnSuccessListener {
+                val chore = it.toObject(Chore::class.java)
+                callback?.invoke(chore!!)
+            }
+            .addOnFailureListener {
+                callback?.invoke(null)
+                Log.e(this::class.simpleName, it.message ?: it.toString())
+            }
+    }
+
     fun getChores(userId: String, callback: ((ArrayList<Chore>?) -> Unit)? = null) {
         db.collection("chores").whereEqualTo("parent", ParentDAO().getDocumentReference(userId))
             .get()
@@ -51,7 +64,7 @@ class ChoreDAO {
     }
 
     fun saveChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
-        getDocumentReference(chore.id!!)
+        chore.documentReference
             .set(chore)
             .addOnSuccessListener {
                 callback?.invoke(true)

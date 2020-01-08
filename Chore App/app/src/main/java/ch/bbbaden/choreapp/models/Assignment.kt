@@ -39,15 +39,6 @@ data class Assignment(
         }
     }
 
-    @Exclude
-    fun getDisplayTime(timestamp: Timestamp): String {
-        val date = timestamp.toDate()
-        val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
-        val timeFormat = SimpleDateFormat.getTimeInstance()
-        return if (DateUtils.isToday(date.time))
-            "Today @ ${timeFormat.format(date)}" else dateTimeFormat.format(date)
-    }
-
     private fun addToDate(date: Date, afterDate: Date, unit: Int, value: Int): Date {
         val calendar = Calendar.getInstance()
         calendar.time = date

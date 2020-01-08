@@ -59,6 +59,16 @@ data class Parent(
         }
     }
 
+    fun saveChild(child: Child, callback: ((success: Boolean) -> Unit)? = null) {
+        ChildDAO().saveChild(child) {
+            if (it) {
+                children.remove(child)
+                children.add(child)
+            }
+            callback?.invoke(it)
+        }
+    }
+
     fun saveChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
         ChoreDAO().saveChore(chore) {
             if (it) {
@@ -92,6 +102,20 @@ data class Parent(
                 if (chore.id == choreId){
                     found = true
                     callback?.invoke(chore)
+                }
+            }
+            if (!found) callback?.invoke(null)
+        }
+    }
+
+    @Exclude
+    fun getChild(childId: String, callback: ((child: Child?) -> Unit)? = null) {
+        fetchChildren {
+            var found = false
+            for (child in it) {
+                if (child.id == childId){
+                    found = true
+                    callback?.invoke(child)
                 }
             }
             if (!found) callback?.invoke(null)

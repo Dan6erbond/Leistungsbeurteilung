@@ -1,22 +1,19 @@
 package ch.bbbaden.choreapp.parent.child
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Point
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import ch.bbbaden.choreapp.R
 import ch.bbbaden.choreapp.dialogs.QRDialogFragment
 import ch.bbbaden.choreapp.inflate
 import ch.bbbaden.choreapp.models.Child
+import ch.bbbaden.choreapp.smallerDimension
 import kotlinx.android.synthetic.main.card_view_parent_child.view.*
 
 
-class ChildRecyclerAdapter(private val children: List<Child>) :
+class ChildRecyclerAdapter(private val children: List<Child>, private val listener: ChildHolder.ChildHolderListener) :
     RecyclerView.Adapter<ChildRecyclerAdapter.ChildHolder>() {
 
     override fun onCreateViewHolder(
@@ -24,9 +21,7 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         viewType: Int
     ): ChildHolder {
         val inflatedView = parent.inflate(R.layout.card_view_parent_child, false)
-        return ChildHolder(
-            inflatedView
-        )
+        return ChildHolder(inflatedView, listener)
     }
 
     override fun getItemCount() = children.size
@@ -36,23 +31,15 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         holder.bindChore(itemChore)
     }
 
-    class ChildHolder(private val view: View) : RecyclerView.ViewHolder(view),
+    class ChildHolder(private val view: View, private val listener: ChildHolderListener) :
+        RecyclerView.ViewHolder(view),
         View.OnClickListener {
 
-        private var child: Child? = null
+        interface ChildHolderListener {
+            fun openDetails(child: Child)
+        }
 
-        private val smallerDimension: Int
-            get() {
-                val manager = view.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-                val display = manager.defaultDisplay
-                val point = Point()
-                display.getSize(point)
-                val width = point.x
-                val height = point.y
-                Pair(width, height)
-                val smallerDimension = if (width < height) width else height
-                return smallerDimension * 3 / 4
-            }
+        private var child: Child? = null
 
         init {
             view.setOnClickListener(this)
@@ -61,7 +48,6 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         @SuppressLint("SetTextI18n")
         fun bindChore(child: Child) {
             this.child = child
-            // view.childImage.setImageResource(R.drawable.ic_menu_camera)
             view.childName.text = child.first
 
             val qrCode = child.getQRCode(smallerDimension)
@@ -80,7 +66,7 @@ class ChildRecyclerAdapter(private val children: List<Child>) :
         }
 
         override fun onClick(v: View) {
-            Toast.makeText(itemView.context, "${child?.id} clicked.", Toast.LENGTH_SHORT).show()
+            listener.openDetails(child!!)
         }
     }
 }
