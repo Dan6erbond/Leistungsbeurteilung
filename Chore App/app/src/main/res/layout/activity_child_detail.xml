@@ -60,7 +60,7 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="16dp"
         android:text="@string/completed_chores"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
