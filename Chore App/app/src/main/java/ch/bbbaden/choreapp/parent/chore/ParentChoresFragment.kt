@@ -65,9 +65,9 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     }
 
     private fun setupUI() {
-        UserManager.parent?.fetchChores {
-            adapter = ChoreRecyclerAdapter(it, this)
-            adapter.notifyDataSetChanged()
+        UserManager.parent!!.fetchChores {
+            UserManager.parent!!.updateUndeletedChores()
+            adapter = ChoreRecyclerAdapter(UserManager.parent!!.undeletedChores, this)
             recyclerViewChores.adapter = adapter
         }
 
@@ -91,8 +91,9 @@ class ParentChoresFragment : Fragment(), AddChoreDialogFragment.AddChoreDialogLi
     }
 
     override fun addChore(dialog: DialogFragment, chore: Chore) {
-        UserManager.parent?.addChore(chore) {
+        UserManager.parent!!.addChore(chore) {
             if (it != null) {
+                UserManager.parent!!.updateUndeletedChores()
                 adapter.notifyDataSetChanged()
             } else {
                 openErrorCardView()

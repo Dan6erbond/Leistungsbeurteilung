@@ -17,6 +17,8 @@ import ch.bbbaden.choreapp.models.Assignment
 import ch.bbbaden.choreapp.models.Chore
 import kotlinx.android.synthetic.main.activity_chore_detail.*
 
+const val EDIT_CHORE_NAME_DIALOG_TAG = "EditChoreNameDialogFragment"
+const val EDIT_CHORE_DESCRIPTION_DIALOG_TAG = "EditChoreDescriptionDialogFragment"
 
 class ChoreDetailActivity : AppCompatActivity(),
     AddAssignmentDialogFragment.AddAssignmentDialogListener,
@@ -64,23 +66,29 @@ class ChoreDetailActivity : AppCompatActivity(),
             dialog.show(supportFragmentManager, "AddAssignmentDialogFragment")
         }
 
-        editName.setOnClickListener {
+        val editNameOnClickListener = View.OnClickListener {
             val dialog = InputDialogFragment(
                 this,
                 resources.getString(R.string.change_name),
                 resources.getString(R.string.chore_name)
             )
-            dialog.show(supportFragmentManager, "EditChoreNameDialogFragment")
+            dialog.show(supportFragmentManager, EDIT_CHORE_NAME_DIALOG_TAG)
         }
 
-        editDescription.setOnClickListener {
+        editName.setOnClickListener(editNameOnClickListener)
+        choreName.setOnClickListener(editNameOnClickListener)
+
+        val editDescriptionOnClickListener = View.OnClickListener {
             val dialog = InputDialogFragment(
                 this,
                 resources.getString(R.string.change_description),
                 resources.getString(R.string.chore_description)
             )
-            dialog.show(supportFragmentManager, "EditChoreDescriptionDialogFragment")
+            dialog.show(supportFragmentManager, EDIT_CHORE_DESCRIPTION_DIALOG_TAG)
         }
+
+        editDescription.setOnClickListener(editDescriptionOnClickListener)
+        choreDescription.setOnClickListener(editDescriptionOnClickListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -161,13 +169,13 @@ class ChoreDetailActivity : AppCompatActivity(),
 
     override fun setInput(dialog: DialogFragment, input: String) {
         when (dialog.tag) {
-            "EditChoreNameDialogFragment" -> {
+            EDIT_CHORE_NAME_DIALOG_TAG -> {
                 chore.name = input
                 save {
                     if (it) choreName.text = chore.name
                 }
             }
-            "EditChoreDescriptionDialogFragment" -> {
+            EDIT_CHORE_DESCRIPTION_DIALOG_TAG -> {
                 chore.description = input
                 save {
                     if (it) choreDescription.text = chore.description

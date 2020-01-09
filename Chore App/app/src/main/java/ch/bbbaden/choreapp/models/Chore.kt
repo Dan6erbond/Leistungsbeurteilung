@@ -14,7 +14,8 @@ class Chore(
     var name: String? = null,
     var description: String? = null,
     val assignments: ArrayList<Assignment> = arrayListOf(),
-    var parent: DocumentReference? = null
+    var parent: DocumentReference? = null,
+    var deleted: Boolean = false
 ) {
 
     @get:Exclude

@@ -13,7 +13,7 @@ class ChoreDAO {
     }
 
     fun getChores(child: Child, callback: ((ArrayList<Chore>?) -> Unit)? = null) {
-        getChores(child.parent?.id!!) {
+        getChores(child.parent?.id!!, false) {
             if (it != null) {
                 val chores = ArrayList<Chore>()
                 for (chore in it) {
@@ -46,7 +46,11 @@ class ChoreDAO {
             }
     }
 
-    fun getChores(userId: String, callback: ((ArrayList<Chore>?) -> Unit)? = null) {
+    fun getChores(
+        userId: String,
+        getDeleted: Boolean = true,
+        callback: ((List<Chore>?) -> Unit)? = null
+    ) {
         db.collection("chores").whereEqualTo("parent", ParentDAO().getDocumentReference(userId))
             .get()
             .addOnSuccessListener {
@@ -55,7 +59,8 @@ class ChoreDAO {
                     val chore = document.toObject(Chore::class.java)
                     chores.add(chore)
                 }
-                callback?.invoke(chores)
+                if (getDeleted) callback?.invoke(chores)
+                else callback?.invoke(chores.filter { chore -> !chore.deleted })
             }
             .addOnFailureListener {
                 callback?.invoke(null)

@@ -16,7 +16,16 @@ data class Parent(
 ) {
 
     private val children: ArrayList<Child> = arrayListOf()
+
     private val chores: ArrayList<Chore> = arrayListOf()
+
+    @Exclude
+    val undeletedChores: ArrayList<Chore> = arrayListOf()
+
+    fun updateUndeletedChores() {
+        undeletedChores.clear()
+        undeletedChores.addAll(chores.filter { chore -> !chore.deleted })
+    }
 
     @get:Exclude
     val documentReference: DocumentReference
@@ -103,8 +112,12 @@ data class Parent(
     }
 
     fun deleteChore(chore: Chore, callback: ((success: Boolean) -> Unit)? = null) {
-        ChoreDAO().deleteChore(chore) {
-            if (it) chores.remove(chore)
+        chore.deleted = true
+        ChoreDAO().saveChore(chore) {
+            if (it) {
+                chores.remove(chore)
+                chores.add(chore)
+            }
             callback?.invoke(it)
         }
     }
@@ -114,7 +127,7 @@ data class Parent(
         fetchChores {
             var found = false
             for (chore in it) {
-                if (chore.id == choreId){
+                if (chore.id == choreId) {
                     found = true
                     callback?.invoke(chore)
                 }
@@ -128,7 +141,7 @@ data class Parent(
         fetchChildren {
             var found = false
             for (child in it) {
-                if (child.id == childId){
+                if (child.id == childId) {
                     found = true
                     callback?.invoke(child)
                 }
