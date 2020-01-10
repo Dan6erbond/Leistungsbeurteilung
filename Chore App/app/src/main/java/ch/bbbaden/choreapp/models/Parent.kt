@@ -19,7 +19,7 @@ data class Parent(
 
     private val chores: ArrayList<Chore> = arrayListOf()
 
-    @Exclude
+    @get:Exclude
     val undeletedChores: ArrayList<Chore> = arrayListOf()
 
     fun updateUndeletedChores() {
