@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_border"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:selectableItemBackground"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/choreName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dishes"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/choreDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dishes must be done by 18:00." />
+</LinearLayout>
