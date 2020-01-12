@@ -24,9 +24,8 @@ class ChoresWidgetProvider : AppWidgetProvider() {
         ) {
             val views = RemoteViews(context?.packageName, R.layout.chores_app_widget)
 
-            val widgetServiceIntent = Intent(context, ChoresWidgetService::class.java).apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetId)
-            }
+            val widgetServiceIntent = Intent(context, ChoresWidgetService::class.java)
+            widgetServiceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetId)
 
             UserManager.getUser {
                 if (it is Child) {

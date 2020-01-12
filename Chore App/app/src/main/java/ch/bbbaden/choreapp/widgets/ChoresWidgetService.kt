@@ -35,6 +35,7 @@ class ChoresRemoteViewsFactory(private val context: Context, intent: Intent) :
     }
 
     private fun loadData() {
+        chores.add(Chore("asdfjkl", "asdfjl", "asdfjkl"))
         UserManager.getUser {
             if (it is Child) {
                 it.fetchChores { chores ->
